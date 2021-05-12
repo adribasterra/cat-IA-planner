@@ -71,9 +71,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_HAUNT)
                                 {
                                     // GO_TO_FOX action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_NONE;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_CLOSE_TO_FOX;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_CLOSE_TO_FOX;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -113,9 +113,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_HAUNT)
                                 {
                                     // KILL_FOX action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_AXE_OWNED | WorldFeller.WorldState.WORLD_STATE_CLOSE_TO_FOX;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_FOX_DEAD | WorldFeller.WorldState.WORLD_STATE_HAS_RAW_MEAT;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_AXE_OWNED | World.WorldState.WORLD_STATE_CLOSE_TO_FOX;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_FOX_DEAD | World.WorldState.WORLD_STATE_HAS_RAW_MEAT;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -158,9 +158,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_FELL_TREE)
                                 {
                                     // GO_TO_TREE action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_NONE;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_CLOSE_TO_TREE;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_CLOSE_TO_TREE;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -200,9 +200,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_FELL_TREE)
                                 {
                                     // FELL_TREE action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_CLOSE_TO_TREE | WorldFeller.WorldState.WORLD_STATE_AXE_OWNED;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_TREE_FELLED;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_CLOSE_TO_TREE | World.WorldState.WORLD_STATE_AXE_OWNED;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_TREE_FELLED;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -242,9 +242,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_FELL_TREE)
                                 {
                                     // COLLECT_WOOD action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_TREE_FELLED;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_HAS_WOOD;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_TREE_FELLED;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_HAS_WOOD;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -288,9 +288,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_RAW_MEAT)
                                 {
                                     // EAT_RAW_MEAT action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_HAS_RAW_MEAT;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_HAS_RAW_MEAT;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_HAS_RAW_MEAT;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_HAS_RAW_MEAT;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -333,9 +333,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT)
                                 {
                                     // LIGHT_FIRE action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_HAS_WOOD;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_FIRE_ON;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_HAS_WOOD;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_HAS_WOOD;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_FIRE_ON;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_HAS_WOOD;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -375,9 +375,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT)
                                 {
                                     // COOK_MEAT action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_HAS_RAW_MEAT;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_HAS_COOKED_MEAT;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_FIRE_ON | WorldFeller.WorldState.WORLD_STATE_HAS_RAW_MEAT;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_HAS_RAW_MEAT;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_HAS_COOKED_MEAT;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_FIRE_ON | World.WorldState.WORLD_STATE_HAS_RAW_MEAT;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -418,9 +418,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT)
                                 {
                                     // EAT_COOKED_MEAT action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_HAS_COOKED_MEAT;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_HAS_COOKED_MEAT;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_HAS_COOKED_MEAT;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_HAS_COOKED_MEAT;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -464,9 +464,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE)
                                 {
                                     // GO_TO_COTTAGE action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_NONE;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_CLOSE_TO_COTTAGE;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_CLOSE_TO_COTTAGE;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -507,9 +507,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE)
                                 {
                                     // BUILD_COTTAGE action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_HAS_WOOD;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_COTTAGE_BUILT;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_HAS_WOOD;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_HAS_WOOD;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_COTTAGE_BUILT;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_HAS_WOOD;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -552,9 +552,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_PICK_UP_AXE)
                                 {
                                     // GO_TO_AXE action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_NONE;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_CLOSE_TO_AXE;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_CLOSE_TO_AXE;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
@@ -594,9 +594,9 @@ public class NPBehaviourTree : MonoBehaviour
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_PICK_UP_AXE)
                                 {
                                     // PICK_UP_AXE action - preconditions & effects
-                                    WorldFeller.WorldState preconditions = WorldFeller.WorldState.WORLD_STATE_NONE;
-                                    WorldFeller.WorldState positiveEffects = WorldFeller.WorldState.WORLD_STATE_AXE_OWNED;
-                                    WorldFeller.WorldState negativeEffects = WorldFeller.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState preconditions = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState positiveEffects = World.WorldState.WORLD_STATE_AXE_OWNED;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)

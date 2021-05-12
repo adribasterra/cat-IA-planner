@@ -21,7 +21,7 @@ public class Planning : MonoBehaviour
 
     public List<NodePlanning> GetPlan()
     {
-        FindPlan(WorldFeller.WorldState.WORLD_STATE_NONE, WorldFeller.WorldState.WORLD_STATE_COTTAGE_BUILT);
+        FindPlan(World.WorldState.WORLD_STATE_NONE, World.WorldState.WORLD_STATE_COTTAGE_BUILT);
 
         return mWorld.plan;
     }
@@ -34,7 +34,7 @@ public class Planning : MonoBehaviour
 
     /***************************************************************************/
 
-    public List<NodePlanning> FindPlan(WorldFeller.WorldState startWorldState, WorldFeller.WorldState targetWorldState)
+    public List<NodePlanning> FindPlan(World.WorldState startWorldState, World.WorldState targetWorldState)
     {
         CurrentStartNode = new NodePlanning(startWorldState, null);
         CurrentTargetNode = new NodePlanning(targetWorldState, null);
@@ -178,7 +178,7 @@ public class Planning : MonoBehaviour
     float Heuristic(NodePlanning nodeA, NodePlanning nodeB)
     {
         // Heuristic function
-        return -WorldFeller.PopulationCount((int)(nodeA.mWorldState | nodeB.mWorldState)) - WorldFeller.PopulationCount((int)(nodeA.mWorldState & nodeB.mWorldState));
+        return -World.PopulationCount((int)(nodeA.mWorldState | nodeB.mWorldState)) - World.PopulationCount((int)(nodeA.mWorldState & nodeB.mWorldState));
     }
 
     /***************************************************************************/

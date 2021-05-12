@@ -4,10 +4,10 @@ using System.Collections;
 public class ActionPlanning
 {
     public ActionType mActionType;
-    public WorldFeller.WorldState mPreconditions;
-    public WorldFeller.WorldState mNegativePreconditions;
-    public WorldFeller.WorldState mEffects;
-    public WorldFeller.WorldState mNegativeEffects;
+    public World.WorldState mPreconditions;
+    public World.WorldState mNegativePreconditions;
+    public World.WorldState mEffects;
+    public World.WorldState mNegativeEffects;
     public float mCost;
     public float mDynamicCost;
     public string mName;
@@ -39,7 +39,7 @@ public class ActionPlanning
 
     /***************************************************************************/
 
-    public ActionPlanning(ActionType actionType, WorldFeller.WorldState preconditions, WorldFeller.WorldState negativePreconditions, WorldFeller.WorldState effects, WorldFeller.WorldState negativeEffects, float cost, string name)
+    public ActionPlanning(ActionType actionType, World.WorldState preconditions, World.WorldState negativePreconditions, World.WorldState effects, World.WorldState negativeEffects, float cost, string name)
     {
         mActionType = actionType;
         mPreconditions = preconditions;

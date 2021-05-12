@@ -21,6 +21,7 @@ public class World : MonoBehaviour
 
     /***************************************************************************/
 
+    [System.Flags]
     public enum WorldState
     {
         WORLD_STATE_NONE = 0,
