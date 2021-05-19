@@ -115,6 +115,12 @@ public class WorldFeller : MonoBehaviour
             if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT) hunger += 20;
             if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE) timesLeftToBuildCottage--;
 
+
+            if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_GO_TO_TREE) {
+                CalculateNearestTree();
+            }
+
+
             // If preconditions are met we can apply effects and the new state is valid
             if ((node.mWorldState & action.mPreconditions) == action.mPreconditions &&
                 (node.mWorldState & action.mNegativePreconditions) == World.WorldState.WORLD_STATE_NONE )
@@ -143,4 +149,10 @@ public class WorldFeller : MonoBehaviour
 
     /***************************************************************************/
 
+    private int CalculateNearestTree()
+    {
+        int result = 0;
+
+        return result;
+    }
 }
