@@ -13,9 +13,12 @@ public class Grid : MonoBehaviour {
 	float nodeDiameter;
 	int gridSizeX, gridSizeY;
 
+    [HideInInspector]
     public List<NodePathfinding> openSet;
-	public HashSet<NodePathfinding> closedSet;
+    [HideInInspector]
+    public HashSet<NodePathfinding> closedSet;
 
+    [HideInInspector]
     public List<NodePathfinding> path;
 
   /***************************************************************************/

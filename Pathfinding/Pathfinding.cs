@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class Pathfinding : MonoBehaviour
 {
+    [HideInInspector]
     public Transform mSeeker;
+    [HideInInspector]
     public Transform mTarget;
 
     public bool EightConnectivity = true;
@@ -31,8 +33,9 @@ public class Pathfinding : MonoBehaviour
 
     /***************************************************************************/
 
-    public void InitPathfinding(Transform seeker, Transform target)
+    public bool InitPathfinding(Transform seeker, Transform target)
     {
+        bool success = false;
         mSeeker = seeker;
         mTarget = target;
         // Positions changed?
@@ -49,7 +52,7 @@ public class Pathfinding : MonoBehaviour
             {
                 Iterations = -1;
             }
-            FindPath( mSeeker.position, mTarget.position, Iterations );
+            success = FindPath( mSeeker.position, mTarget.position, Iterations );
         }
         else
         {
@@ -61,17 +64,18 @@ public class Pathfinding : MonoBehaviour
                 {
                     // One iteration, look until path is found
                     Iterations = -1;
-                    FindPath(mSeeker.position, mTarget.position, Iterations );
+                    success = FindPath(mSeeker.position, mTarget.position, Iterations );
                 }
                 else if( Time.time > LastStepTime + TimeBetweenSteps )
                 {
                     // Iterate increasing depth every time step
                     LastStepTime = Time.time;
                     Iterations++;
-                    FindPath(mSeeker.position, mTarget.position, Iterations );
+                    success = FindPath(mSeeker.position, mTarget.position, Iterations );
                 }   
             }
         }
+        return success;
 	}
 
     /***************************************************************************/
@@ -130,7 +134,7 @@ public class Pathfinding : MonoBehaviour
                 // Open neighbours
                 foreach (NodePathfinding neighbour in Grid.GetNeighbours(node, EightConnectivity))
                 {
-                    float dist = node.gCost + GetDistance(node, neighbour) * node.mCostMultiplier;
+                    float dist = node.gCost /* * node.mCostMultiplier */ + Heuristic(node, neighbour) * node.mCostMultiplier;
 
                     if (!neighbour.mWalkable || closedSet.Contains(neighbour))
                     {
@@ -203,8 +207,8 @@ public class Pathfinding : MonoBehaviour
         }
         else
         {
-            //Euclidean distance
-            distance = distanceBtwNodes * Mathf.Abs(distX * distX + distY * distY);
+            // Manhattan
+            distance = distanceBtwNodes * (Mathf.Abs(distX) + Mathf.Abs(distY));
         }
 
         return distance;
@@ -227,8 +231,9 @@ public class Pathfinding : MonoBehaviour
 
         if (EightConnectivity)
         {
-            //distance = Mathf.Sqrt(distX * distX + distY * distY);
-            distance = distanceBtwNodes * (distX + distY) + (distanceBtwDiagonals - 2 * distanceBtwNodes) * Mathf.Min(distX, distY);
+            //Euclidean distance
+            distance = distanceBtwNodes * Mathf.Sqrt(distX * distX + distY * distY);
+            //distance = distanceBtwNodes * (distX + distY) + (distanceBtwDiagonals - 2 * distanceBtwNodes) * Mathf.Min(distX, distY);
         }
         else
         {

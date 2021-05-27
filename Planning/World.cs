@@ -5,19 +5,26 @@ using System.Linq;
 
 public class World : MonoBehaviour
 {
+    [HideInInspector]
     public List<NodePlanning> openSet;
+    [HideInInspector]
     public HashSet<NodePlanning> closedSet;
 
+    [HideInInspector]
     public List<NodePlanning> plan;
     private World world;
 
-    private GameObject[] trees;
+    [HideInInspector]
+    public GameObject[] trees;
     public GameObject fox, axe, cottage, feller;
 
+    [HideInInspector]
     private Pathfinding pathfinding;
 
+    [HideInInspector]
     public WorldState mWorldState;
 
+    [HideInInspector]
     public List<ActionPlanning> mActionList;
 
     private float hungerFactor = 0.5f;
@@ -30,9 +37,6 @@ public class World : MonoBehaviour
     [System.Flags]
     public enum WorldState
     {
-        //El hacha está cogida
-        //Quedan x árboles sin talar
-
         WORLD_STATE_NONE = 0,
         WORLD_STATE_AXE_OWNED = 1,
         WORLD_STATE_CLOSE_TO_FOX = 2,
