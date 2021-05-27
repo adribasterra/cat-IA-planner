@@ -31,8 +31,10 @@ public class Pathfinding : MonoBehaviour
 
     /***************************************************************************/
 
-    void Update()
+    public void InitPathfinding(Transform seeker, Transform target)
     {
+        mSeeker = seeker;
+        mTarget = target;
         // Positions changed?
         if( PathInvalid() )
         {
@@ -74,15 +76,24 @@ public class Pathfinding : MonoBehaviour
 
     /***************************************************************************/
 
-	bool PathInvalid()
+    public Grid GetGrid()
+    {
+        return Grid;
+    }
+
+    /***************************************************************************/
+
+    bool PathInvalid()
     {
         return CurrentStartNode != Grid.NodeFromWorldPoint(mSeeker.position) || CurrentTargetNode != Grid.NodeFromWorldPoint(mTarget.position) ;
     }
 
     /***************************************************************************/
 
-	public void FindPath( Vector3 startPos, Vector3 targetPos, int iterations )
+	public bool FindPath( Vector3 startPos, Vector3 targetPos, int iterations = 0 )
     {
+        bool success = false;
+
 		CurrentStartNode  = Grid.NodeFromWorldPoint(startPos);
 		CurrentTargetNode = Grid.NodeFromWorldPoint(targetPos);
 
@@ -141,8 +152,8 @@ public class Pathfinding : MonoBehaviour
             else
             {
                 // Path found!
+                success = true;
                 RetracePath(CurrentStartNode, CurrentTargetNode);
-
                 // Path found
                 Iterations = -1;
 
@@ -152,6 +163,7 @@ public class Pathfinding : MonoBehaviour
                 Debug.LogFormat("\tClosed nodes: {0}", closedSet.Count );
             }
 		}
+        return success;
 	}
 
     /***************************************************************************/

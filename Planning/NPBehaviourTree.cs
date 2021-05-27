@@ -13,11 +13,17 @@ public class NPBehaviourTree : MonoBehaviour
 
     public Planning mPlanner;
     public List<NodePlanning> mPlan;
+    public Pathfinding pathfinding;
 
     float mTimeStartAction = 0.0f;
     float mTimeActionLast = 1.0f;
 
     /****************************************************************************/
+
+    void Awake()
+    {
+        pathfinding = this.GetComponent<Pathfinding>();
+    }
 
     // Use this for initialization
     void Start()
@@ -73,19 +79,33 @@ public class NPBehaviourTree : MonoBehaviour
                                     // GO_TO_FOX action - preconditions & effects
                                     World.WorldState preconditions = World.WorldState.WORLD_STATE_NONE;
                                     World.WorldState positiveEffects = World.WorldState.WORLD_STATE_CLOSE_TO_FOX;
-                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_CLOSE_TO_AXE | World.WorldState.WORLD_STATE_CLOSE_TO_TREE | World.WorldState.WORLD_STATE_CLOSE_TO_COTTAGE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+                                        if(pathfinding.GetGrid().path == null)
+                                        {
+                                            // Set default layer for the pathfinding to be able to find a path
+                                            mPlanner.GetWorld().fox.layer = 0;
+                                            pathfinding.GetGrid().UpdateGrid();
 
-                                        // If execution succeeded return "success". Otherwise return "failed".
+                                            pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().fox.transform);
+
+                                            // Reset to unwalkable layer
+                                            mPlanner.GetWorld().fox.layer = 8;
+                                            pathfinding.GetGrid().UpdateGrid();
+                                        }
+
+    // TODO: check if feller has arrived
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Near fox");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -120,14 +140,15 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
-
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Fox killed");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -160,19 +181,37 @@ public class NPBehaviourTree : MonoBehaviour
                                     // GO_TO_TREE action - preconditions & effects
                                     World.WorldState preconditions = World.WorldState.WORLD_STATE_NONE;
                                     World.WorldState positiveEffects = World.WorldState.WORLD_STATE_CLOSE_TO_TREE;
-                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_CLOSE_TO_AXE | World.WorldState.WORLD_STATE_CLOSE_TO_FOX | World.WorldState.WORLD_STATE_CLOSE_TO_COTTAGE;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+                                        if (pathfinding.GetGrid().path == null)
+                                        {
+                                            GameObject nearestTree = mPlanner.GetWorld().GetNearestTreePosition();
+
+                                            // Set default layer for the pathfinding to be able to find a path
+                                            nearestTree.layer = 0;
+                                            pathfinding.GetGrid().UpdateGrid();
+
+                                            pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, nearestTree.transform);
+
+                                            // Reset to unwalkable layer
+                                            nearestTree.layer = 8;
+                                            pathfinding.GetGrid().UpdateGrid();
+                                        }
+
+                                        // TODO: check if feller has arrived
 
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Near tree");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -207,14 +246,15 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
-
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Tree felled");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -249,14 +289,15 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
-
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Wood collected");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -295,14 +336,15 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
-
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Ate raw meat");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -340,14 +382,16 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
 
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Light fire");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -382,14 +426,15 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
-
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Meat cooked");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -412,7 +457,7 @@ public class NPBehaviourTree : MonoBehaviour
                             })
                             { Label = "Cook meat" },
                             // Action 2
-                // TODO: as effects, increment hunger
+    // TODO: as effects, increment hunger
                             new Action((bool eatCookedMeat) =>
                             {
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT)
@@ -425,14 +470,15 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
-
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Ate cooked meat");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -466,19 +512,35 @@ public class NPBehaviourTree : MonoBehaviour
                                     // GO_TO_COTTAGE action - preconditions & effects
                                     World.WorldState preconditions = World.WorldState.WORLD_STATE_NONE;
                                     World.WorldState positiveEffects = World.WorldState.WORLD_STATE_CLOSE_TO_COTTAGE;
-                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_NONE;
+                                    World.WorldState negativeEffects = World.WorldState.WORLD_STATE_CLOSE_TO_AXE | World.WorldState.WORLD_STATE_CLOSE_TO_TREE | World.WorldState.WORLD_STATE_CLOSE_TO_FOX;
 
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+                                        if (pathfinding.GetGrid().path == null)
+                                        {
+                                            // Set default layer for the pathfinding to be able to find a path
+                                            mPlanner.GetWorld().cottage.layer = 0;
+                                            pathfinding.GetGrid().UpdateGrid();
+
+                                            pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().cottage.transform);
+
+                                            // Reset to unwalkable layer
+                                            mPlanner.GetWorld().cottage.layer = 8;
+                                            pathfinding.GetGrid().UpdateGrid();
+                                        }
+
+    // TODO: check if feller has arrived
 
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Near cottage");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -514,14 +576,15 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
-
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Cottage built");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -533,6 +596,8 @@ public class NPBehaviourTree : MonoBehaviour
                                     }
                                     else
                                     {
+                                        Debug.Log(mPlanner.GetWorld().mWorldState);
+                                        Debug.Log(preconditions);
                                         Debug.Log("--- ERROR: PLAN FAILED ---");
                                         return Action.Result.FAILED;
                                     }
@@ -559,14 +624,28 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+                                        if (pathfinding?.GetGrid()?.path == null)
+                                        {
+                                            // Set default layer for the pathfinding to be able to find a path
+                                            mPlanner.GetWorld().axe.layer = 0;
+                                            pathfinding.GetGrid().UpdateGrid();
+
+                                            pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().axe.transform);
+
+                                            // Reset to unwalkable layer
+                                            mPlanner.GetWorld().axe.layer = 8;
+                                            pathfinding.GetGrid().UpdateGrid();
+                                        }
 
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Near axe");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }
@@ -601,14 +680,15 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
-                                        // Apply positive & negative effects
-                                        mPlanner.GetWorld().mWorldState |= positiveEffects;
-                                        mPlanner.GetWorld().mWorldState &= ~negativeEffects;
-
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Axe owned");
+
+                                            // Apply positive & negative effects
+                                            mPlanner.GetWorld().mWorldState |= positiveEffects;
+                                            mPlanner.GetWorld().mWorldState &= ~negativeEffects;
+
                                             mTimeStartAction = Time.time;
                                             return Action.Result.SUCCESS;
                                         }

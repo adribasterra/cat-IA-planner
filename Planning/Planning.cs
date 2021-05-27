@@ -8,20 +8,20 @@ public class Planning : MonoBehaviour
     NodePlanning CurrentStartNode;
     NodePlanning CurrentTargetNode;
 
-    WorldFeller mWorld;
+    World mWorld;
 
     /***************************************************************************/
 
     void Awake()
     {
-        mWorld = GetComponent<WorldFeller>();
+        mWorld = GetComponent<World>();
     }
 
     /***************************************************************************/
 
     public List<NodePlanning> GetPlan()
     {
-        FindPlan(World.WorldState.WORLD_STATE_NONE, World.WorldState.WORLD_STATE_COTTAGE_BUILT);
+        FindPlan(World.WorldState.WORLD_STATE_NONE, World.WorldState.WORLD_STATE_AXE_OWNED);
 
         return mWorld.plan;
     }
@@ -168,7 +168,7 @@ public class Planning : MonoBehaviour
 
     /***************************************************************************/
 
-    public WorldFeller GetWorld()
+    public World GetWorld()
     {
         return mWorld;
     }

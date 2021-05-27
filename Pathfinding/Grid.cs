@@ -48,6 +48,22 @@ public class Grid : MonoBehaviour {
 
     /***************************************************************************/
 
+    public void UpdateGrid()
+    {
+        Vector3 worldBottomLeft = transform.position - Vector3.right * gridWorldSize.x / 2 - Vector3.forward * gridWorldSize.y / 2;
+        for (int x = 0; x < gridSizeX; x++)
+        {
+            for (int y = 0; y < gridSizeY; y++)
+            {
+                Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
+                grid[x, y].mWalkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
+                grid[x, y].mCostMultiplier = (Physics.CheckSphere(worldPoint, nodeRadius, costMultiplierMask)) ? 1.5f : 1.0f;
+            }
+        }
+    }
+
+    /***************************************************************************/
+
     public NodePathfinding GetNode(int x, int y)
     {
         return grid[x, y];
