@@ -11,9 +11,14 @@ public class NPBehaviourTree : MonoBehaviour
     int mPlanSteps = 0;
     int mCurrentAction = -1;
 
+    [HideInInspector]
     public Planning mPlanner;
+    [HideInInspector]
     public List<NodePlanning> mPlan;
+    [HideInInspector]
     public Pathfinding pathfinding;
+
+    private PlayerController playerMovement;
 
     float mTimeStartAction = 0.0f;
     float mTimeActionLast = 1.0f;
@@ -23,6 +28,7 @@ public class NPBehaviourTree : MonoBehaviour
     void Awake()
     {
         pathfinding = this.GetComponent<Pathfinding>();
+        playerMovement = mPlanner.GetWorld().feller.GetComponent<PlayerController>();
     }
 
     // Use this for initialization
@@ -90,7 +96,11 @@ public class NPBehaviourTree : MonoBehaviour
                                             mPlanner.GetWorld().fox.layer = 0;
                                             pathfinding.GetGrid().UpdateGrid();
 
-                                            pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().fox.transform);
+                                            if(pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().fox.transform))
+                                            {
+                                                //Set path to feller
+                                                playerMovement.SetPath(pathfinding.GetGrid().path);
+                                            }
 
                                             // Reset to unwalkable layer
                                             mPlanner.GetWorld().fox.layer = 8;
@@ -98,9 +108,11 @@ public class NPBehaviourTree : MonoBehaviour
                                         }
 
     // TODO: check if feller has arrived
-                                        if (Time.time > mTimeStartAction + mTimeActionLast)
+                                        if (playerMovement.hasArrived)
                                         {
                                             Debug.Log("Near fox");
+                                            playerMovement.hasArrived = false;
+                                            pathfinding.GetGrid().path = null;
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
@@ -189,12 +201,17 @@ public class NPBehaviourTree : MonoBehaviour
                                         if (pathfinding.GetGrid().path == null)
                                         {
                                             GameObject nearestTree = mPlanner.GetWorld().GetNearestTreePosition();
-
+                                            mPlanner.GetWorld().SetFellingTree(nearestTree);
                                             // Set default layer for the pathfinding to be able to find a path
+                                            Debug.Log(nearestTree);
                                             nearestTree.layer = 0;
                                             pathfinding.GetGrid().UpdateGrid();
 
-                                            pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, nearestTree.transform);
+                                            if(pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, nearestTree.transform))
+                                            {
+                                                //Set path to feller
+                                                playerMovement.SetPath(pathfinding.GetGrid().path);
+                                            }
 
                                             // Reset to unwalkable layer
                                             nearestTree.layer = 8;
@@ -204,9 +221,11 @@ public class NPBehaviourTree : MonoBehaviour
                                         // TODO: check if feller has arrived
 
                                         // If execution succeeded return "success". Otherwise return "failed".
-                                        if (Time.time > mTimeStartAction + mTimeActionLast)
+                                        if (playerMovement.hasArrived)
                                         {
                                             Debug.Log("Near tree");
+                                            playerMovement.hasArrived = false;
+                                            pathfinding.GetGrid().path = null;
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
@@ -250,6 +269,8 @@ public class NPBehaviourTree : MonoBehaviour
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Tree felled");
+
+                                            mPlanner.GetWorld().FellTree();
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
@@ -323,7 +344,7 @@ public class NPBehaviourTree : MonoBehaviour
                           ),// Sequence - FELL TREE
 
                           new Sequence(                             // EAT RAW MEAT
-                // TODO: as effects, increment hunger
+    // TODO: as effects, increment hunger
                             new Action((bool eatRawMeat) =>
                             {
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_RAW_MEAT)
@@ -523,7 +544,11 @@ public class NPBehaviourTree : MonoBehaviour
                                             mPlanner.GetWorld().cottage.layer = 0;
                                             pathfinding.GetGrid().UpdateGrid();
 
-                                            pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().cottage.transform);
+                                            if (pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().cottage.transform))
+                                            {
+                                                //Set path to feller
+                                                playerMovement.SetPath(pathfinding.GetGrid().path);
+                                            }
 
                                             // Reset to unwalkable layer
                                             mPlanner.GetWorld().cottage.layer = 8;
@@ -533,9 +558,11 @@ public class NPBehaviourTree : MonoBehaviour
     // TODO: check if feller has arrived
 
                                         // If execution succeeded return "success". Otherwise return "failed".
-                                        if (Time.time > mTimeStartAction + mTimeActionLast)
+                                        if (playerMovement.hasArrived)
                                         {
                                             Debug.Log("Near cottage");
+                                            playerMovement.hasArrived = false;
+                                            pathfinding.GetGrid().path = null;
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
@@ -563,7 +590,7 @@ public class NPBehaviourTree : MonoBehaviour
                             })
                             { Label = "Go to cottage" },
                             // Action 1
-                // TODO: make timesLeftToBuildCottage--
+    // TODO: make timesLeftToBuildCottage--
                             new Action((bool buildCottage) =>
                             {
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE)
@@ -630,17 +657,23 @@ public class NPBehaviourTree : MonoBehaviour
                                             mPlanner.GetWorld().axe.layer = 0;
                                             pathfinding.GetGrid().UpdateGrid();
 
-                                            pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().axe.transform);
-
+                                            if(pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().axe.transform))
+                                            {
+                                                //Set path to feller
+                                                playerMovement.SetPath(pathfinding.GetGrid().path);
+                                            }
+                                            
                                             // Reset to unwalkable layer
                                             mPlanner.GetWorld().axe.layer = 8;
                                             pathfinding.GetGrid().UpdateGrid();
                                         }
 
                                         // If execution succeeded return "success". Otherwise return "failed".
-                                        if (Time.time > mTimeStartAction + mTimeActionLast)
+                                        if (playerMovement.hasArrived)
                                         {
                                             Debug.Log("Near axe");
+                                            playerMovement.hasArrived = false;
+                                            pathfinding.GetGrid().path = null;
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
@@ -684,6 +717,10 @@ public class NPBehaviourTree : MonoBehaviour
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Axe owned");
+
+                                            // Grab axe
+                                            mPlanner.GetWorld().axe.SetActive(false);
+                                            mPlanner.GetWorld().feller.GetComponent<PlayerController>().ActiveAxe();
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;

@@ -21,7 +21,7 @@ public class Planning : MonoBehaviour
 
     public List<NodePlanning> GetPlan()
     {
-        FindPlan(World.WorldState.WORLD_STATE_NONE, World.WorldState.WORLD_STATE_AXE_OWNED);
+        FindPlan(World.WorldState.WORLD_STATE_NONE, World.WorldState.WORLD_STATE_COTTAGE_BUILT);
 
         return mWorld.plan;
     }

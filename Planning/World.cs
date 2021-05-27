@@ -5,29 +5,20 @@ using System.Linq;
 
 public class World : MonoBehaviour
 {
-    [HideInInspector]
-    public List<NodePlanning> openSet;
-    [HideInInspector]
-    public HashSet<NodePlanning> closedSet;
+    [HideInInspector] public List<ActionPlanning> mActionList;
+    [HideInInspector] public HashSet<NodePlanning> closedSet;
+    [HideInInspector] public List<NodePlanning> openSet;
+    [HideInInspector] public List<NodePlanning> plan;
+    [HideInInspector] public WorldState mWorldState;
+    [HideInInspector] public GameObject[] trees;
 
-    [HideInInspector]
-    public List<NodePlanning> plan;
-    private World world;
-
-    [HideInInspector]
-    public GameObject[] trees;
+    [Header("Elements")]
     public GameObject fox, axe, cottage, feller;
 
-    [HideInInspector]
     private Pathfinding pathfinding;
+    private World world;
 
-    [HideInInspector]
-    public WorldState mWorldState;
-
-    [HideInInspector]
-    public List<ActionPlanning> mActionList;
-
-    private float hungerFactor = 0.5f;
+    private GameObject fellingTree;
 
     public float hunger = 0f;
     public int timesLeftToBuildCottage = 1;
@@ -61,8 +52,8 @@ public class World : MonoBehaviour
     void Awake()
     {
         pathfinding = this.GetComponent<Pathfinding>();
-
         trees = GameObject.FindGameObjectsWithTag("Tree");
+        fellingTree = null;
 
         mActionList = new List<ActionPlanning>();
         /************************************************/
@@ -150,8 +141,6 @@ public class World : MonoBehaviour
             hunger += action.mCost;
             //Debug.Log(hunger);
 
-            action.mDynamicCost = action.mCost + hungerFactor * hunger;
-
             if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT) hunger += 40;
             if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT) hunger += 20;
             if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE) timesLeftToBuildCottage--;
@@ -229,5 +218,21 @@ public class World : MonoBehaviour
         }
         Debug.Log("TARGET IS NULL");
         return baseCost;
+    }
+
+    /***************************************************************************/
+
+    public void SetFellingTree(GameObject tree)
+    {
+        fellingTree = tree;
+    }
+
+    public void FellTree()
+    {
+        if(fellingTree != null)
+        {
+            fellingTree.SetActive(false);
+            fellingTree = null;
+        }
     }
 }
