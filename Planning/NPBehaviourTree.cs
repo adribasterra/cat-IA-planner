@@ -207,17 +207,15 @@ public class NPBehaviourTree : MonoBehaviour
                                         {
                                             GameObject nearestTree = mPlanner.GetWorld().GetNearestTreePosition();
                                             mPlanner.GetWorld().SetFellingTree(nearestTree);
-                                            
-                                            // Set default layer for the pathfinding to be able to find a path
-                                            nearestTree.layer = 0;
-                                            pathfinding.GetGrid().UpdateGrid();
-
 
                                             // Set default layer for the pathfinding to be able to find a path
-                                            mPlanner.GetWorld().tree.layer = 0;
+                                            nearestTree.transform.GetChild(0).GetChild(1).gameObject.layer = 0;
                                             pathfinding.GetGrid().UpdateGrid();
 
-                                            if (pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().tree.transform))
+                                            // Set default layer for the pathfinding to be able to find a path
+                                            pathfinding.GetGrid().UpdateGrid();
+
+                                            if (pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, nearestTree.transform))
                                             {
                                                 Debug.Log("Path set");
                                                 //Set path to feller
@@ -229,7 +227,7 @@ public class NPBehaviourTree : MonoBehaviour
                                             }
 
                                             // Reset to unwalkable layer
-                                            nearestTree.layer = 8;
+                                            nearestTree.transform.GetChild(0).GetChild(1).gameObject.layer = 8;
                                             pathfinding.GetGrid().UpdateGrid();
                                         }
 
@@ -286,6 +284,7 @@ public class NPBehaviourTree : MonoBehaviour
                                             Debug.Log("Tree felled");
 
                                             mPlanner.GetWorld().FellTree();
+                                            mPlanner.GetWorld().SetWood();
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
@@ -329,6 +328,7 @@ public class NPBehaviourTree : MonoBehaviour
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Wood collected");
+                                            mPlanner.GetWorld().CollectWood();
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;

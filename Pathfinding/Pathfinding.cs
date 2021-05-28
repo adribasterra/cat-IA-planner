@@ -47,7 +47,7 @@ public class Pathfinding : MonoBehaviour
                 Grid.path.Clear();
             }
             // Start calculating path again
-            Iterations = 0;
+            Iterations = -1;
             if( TimeBetweenSteps == 20.0f )
             {
                 Iterations = -1;

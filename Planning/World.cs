@@ -13,12 +13,18 @@ public class World : MonoBehaviour
     [HideInInspector] public GameObject[] trees;
 
     [Header("Elements")]
-    public GameObject fox, axe, cottage, feller;
+    public GameObject fox;
+    public GameObject axe;
+    public GameObject cottage;
+    public GameObject feller;
 
     private Pathfinding pathfinding;
     private World world;
 
     private GameObject fellingTree;
+    private GameObject tree;
+    private GameObject trunk;
+    private GameObject wood;
 
     public float hunger = 0f;
     public int timesLeftToBuildCottage = 1;
@@ -181,15 +187,17 @@ public class World : MonoBehaviour
 
     public GameObject GetNearestTreePosition()
     {
-        GameObject result = null;
+        GameObject result = trees[0];
         float minDistance = float.MaxValue;
         foreach (GameObject tree in trees)
         {
             // Set destination and origin as walkable so taht the pathfinding can find path
             feller.layer = 0;
-            tree.layer = 0;
+            tree.transform.GetChild(0).GetChild(1).gameObject.layer = 0;
+            // TODO: TAMBIÉN LOS PUTOS HIJOS ME CAGO EN LA PUTA
             pathfinding.GetGrid().UpdateGrid();
-            if (pathfinding.FindPath(feller.transform.position, tree.transform.position))
+
+            if (pathfinding.FindPath(feller.transform.position, tree.transform.position.normalized, 0))
             {
                 float dist = Mathf.Abs(Vector3.Distance(feller.transform.position, tree.transform.position));
                 if (minDistance > dist)
@@ -200,9 +208,9 @@ public class World : MonoBehaviour
             }
             else
             {
-                Debug.Log("Failed with tree");
+                Debug.Log("Inaccessible tree");
             }
-            tree.layer = 8; // Unwalkable
+            tree.transform.GetChild(0).GetChild(1).gameObject.layer = 8; // Unwalkable
             pathfinding.GetGrid().UpdateGrid();
         }
         return result;
@@ -212,12 +220,13 @@ public class World : MonoBehaviour
 
     private float CalculateDynamicCost(GameObject target, float baseCost)
     {
+        float result = baseCost;
         if (target)
         {
-            return baseCost + Mathf.Abs(Vector3.Distance(feller.transform.position, target.transform.position)) * (hunger < 1 ? 1: hunger);
+            result = baseCost + Mathf.Abs(Vector3.Distance(feller.transform.position, target.transform.position)) * (hunger < 1 ? 1: hunger);
         }
-        Debug.Log("TARGET IS NULL");
-        return baseCost;
+        else Debug.Log("TARGET IS NULL");
+        return result;
     }
 
     /***************************************************************************/
@@ -225,14 +234,39 @@ public class World : MonoBehaviour
     public void SetFellingTree(GameObject tree)
     {
         fellingTree = tree;
+        this.tree = fellingTree.transform.Find("Tree").gameObject;
+        wood = fellingTree.transform.Find("Wood").gameObject;
+        trunk = fellingTree.transform.Find("Trunk").gameObject;
+        //Debug.Log("Tree: " + this.tree + ", " + "Wood: " + this.wood + ", " + "Trunk: " + this.trunk + " ");
     }
 
     public void FellTree()
     {
-        if(fellingTree != null)
+        if (tree != null)
         {
-            fellingTree.SetActive(false);
+            tree.SetActive(false);
+            trunk.SetActive(true);
+        }
+        else Debug.Log("tree is NULL");
+    }
+
+    public void SetWood()
+    {
+        if (wood != null)
+        {
+            wood.SetActive(true);
+        }
+        else Debug.Log("wood is NULL");
+    }
+
+    public void CollectWood()
+    {
+        if (wood != null)
+        {
+            wood.SetActive(false);
+            wood = null;
             fellingTree = null;
         }
+        else Debug.Log("wood is NULL");
     }
 }
