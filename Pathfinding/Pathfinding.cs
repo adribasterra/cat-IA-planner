@@ -57,7 +57,7 @@ public class Pathfinding : MonoBehaviour
         else
         {
             // Path found?
-            if( Iterations >= 0 )
+            if ( Iterations >= 0 )
             {
                 // One or more iterations?
                 if( TimeBetweenSteps == 0.0f )
@@ -161,10 +161,10 @@ public class Pathfinding : MonoBehaviour
                 // Path found
                 Iterations = -1;
 
-                Debug.Log("Statistics:");
-                Debug.LogFormat("\tTotal nodes:  {0}", openSet.Count + closedSet.Count );
-                Debug.LogFormat("\tOpen nodes:   {0}", openSet.Count );
-                Debug.LogFormat("\tClosed nodes: {0}", closedSet.Count );
+                //Debug.Log("Statistics:");
+                //Debug.LogFormat("\tTotal nodes:  {0}", openSet.Count + closedSet.Count );
+                //Debug.LogFormat("\tOpen nodes:   {0}", openSet.Count );
+                //Debug.LogFormat("\tClosed nodes: {0}", closedSet.Count );
             }
 		}
         return success;

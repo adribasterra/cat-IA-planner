@@ -21,7 +21,8 @@ public class NPBehaviourTree : MonoBehaviour
     private PlayerController playerMovement;
 
     float mTimeStartAction = 0.0f;
-    float mTimeActionLast = 1.0f;
+    float mTimeActionLast = 2.0f;
+    int step = 1;
 
     /****************************************************************************/
 
@@ -157,6 +158,10 @@ public class NPBehaviourTree : MonoBehaviour
                                         {
                                             Debug.Log("Fox killed");
 
+                                            mPlanner.GetWorld().fox.SetActive(false);
+                                            mPlanner.GetWorld().fox.layer = 0;
+                                            pathfinding.GetGrid().UpdateGrid();
+
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
                                             mPlanner.GetWorld().mWorldState &= ~negativeEffects;
@@ -202,15 +207,25 @@ public class NPBehaviourTree : MonoBehaviour
                                         {
                                             GameObject nearestTree = mPlanner.GetWorld().GetNearestTreePosition();
                                             mPlanner.GetWorld().SetFellingTree(nearestTree);
+                                            
                                             // Set default layer for the pathfinding to be able to find a path
-                                            Debug.Log(nearestTree);
                                             nearestTree.layer = 0;
                                             pathfinding.GetGrid().UpdateGrid();
 
-                                            if(pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, nearestTree.transform))
+
+                                            // Set default layer for the pathfinding to be able to find a path
+                                            mPlanner.GetWorld().tree.layer = 0;
+                                            pathfinding.GetGrid().UpdateGrid();
+
+                                            if (pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, mPlanner.GetWorld().tree.transform))
                                             {
+                                                Debug.Log("Path set");
                                                 //Set path to feller
                                                 playerMovement.SetPath(pathfinding.GetGrid().path);
+                                            }
+                                            else
+                                            {
+                                                Debug.Log("There is no path");
                                             }
 
                                             // Reset to unwalkable layer
@@ -604,9 +619,19 @@ public class NPBehaviourTree : MonoBehaviour
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
                                         // If execution succeeded return "success". Otherwise return "failed".
-                                        if (Time.time > mTimeStartAction + mTimeActionLast)
+                                        if(Time.time > (mTimeStartAction + mTimeActionLast * step / 4))
+                                        {
+                                            Debug.Log("I'm in: " + Time.time + ", " + mTimeStartAction + mTimeActionLast * step / 4);
+                                            mPlanner.GetWorld().cottage.transform.GetChild(step - 1).gameObject.SetActive(true);
+                                            Debug.Log(step++);
+                                            
+                                            mTimeStartAction = Time.time;
+                                        }
+
+                                        if (step > 4)
                                         {
                                             Debug.Log("Cottage built");
+                                            step = 1;
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
@@ -721,6 +746,9 @@ public class NPBehaviourTree : MonoBehaviour
                                             // Grab axe
                                             mPlanner.GetWorld().axe.SetActive(false);
                                             mPlanner.GetWorld().feller.GetComponent<PlayerController>().ActiveAxe();
+                                            mPlanner.GetWorld().axe.layer = 0;
+                                            pathfinding.GetGrid().UpdateGrid();
+
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;

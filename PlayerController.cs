@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject axe;
+    public GameObject playersAxe;
     [Range(1, 5)]
     public float walkSpeed;
 
@@ -49,6 +49,6 @@ public class PlayerController : MonoBehaviour
     
     public void ActiveAxe()
     {
-        axe.SetActive(true);
+        playersAxe.SetActive(true);
     }
 }
