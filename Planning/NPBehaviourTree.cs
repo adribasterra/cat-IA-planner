@@ -278,10 +278,12 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
+                                        mPlanner.GetWorld().feller.GetComponent<Animator>().SetBool("lumbering", true);
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Tree felled");
+                                            mPlanner.GetWorld().feller.GetComponent<Animator>().SetBool("lumbering", false);
 
                                             mPlanner.GetWorld().FellTree();
                                             mPlanner.GetWorld().SetWood();
@@ -329,6 +331,7 @@ public class NPBehaviourTree : MonoBehaviour
                                         {
                                             Debug.Log("Wood collected");
                                             mPlanner.GetWorld().CollectWood();
+                                            mPlanner.GetWorld().feller.GetComponent<PlayerController>().SetBagActive(true);
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
@@ -423,6 +426,8 @@ public class NPBehaviourTree : MonoBehaviour
                                         if (Time.time > mTimeStartAction + mTimeActionLast)
                                         {
                                             Debug.Log("Light fire");
+
+                                            mPlanner.GetWorld().feller.GetComponent<PlayerController>().SetBagActive(false);
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;
@@ -618,11 +623,14 @@ public class NPBehaviourTree : MonoBehaviour
                                     // Check preconditions
                                     if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
                                     {
+                                        mPlanner.GetWorld().feller.GetComponent<Animator>().SetBool("lumbering", true);
+
                                         // If execution succeeded return "success". Otherwise return "failed".
-                                        if(Time.time > (mTimeStartAction + mTimeActionLast * step / 4))
+                                        if (Time.time > (mTimeStartAction + mTimeActionLast * step / 4))
                                         {
-                                            Debug.Log("I'm in: " + Time.time + ", " + mTimeStartAction + mTimeActionLast * step / 4);
+
                                             mPlanner.GetWorld().cottage.transform.GetChild(step - 1).gameObject.SetActive(true);
+                                            mPlanner.GetWorld().feller.GetComponent<PlayerController>().SetBagActive(false);
                                             Debug.Log(step++);
                                             
                                             mTimeStartAction = Time.time;
@@ -632,6 +640,7 @@ public class NPBehaviourTree : MonoBehaviour
                                         {
                                             Debug.Log("Cottage built");
                                             step = 1;
+                                            mPlanner.GetWorld().feller.GetComponent<Animator>().SetBool("lumbering", false);
 
                                             // Apply positive & negative effects
                                             mPlanner.GetWorld().mWorldState |= positiveEffects;

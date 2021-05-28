@@ -5,11 +5,13 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public GameObject playersAxe;
+    public GameObject bag;
+
     [Range(1, 5)]
     public float walkSpeed;
 
-    [HideInInspector]
-    public bool hasArrived;
+    [HideInInspector] public bool hasArrived;
+    [HideInInspector] public Animator animator;
 
     private List<NodePathfinding> path;
     private int i = 0;
@@ -18,6 +20,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         hasArrived = false;
+        animator = this.GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -31,6 +34,7 @@ public class PlayerController : MonoBehaviour
                 if(i >= path.Count)
                 {
                     hasArrived = true;
+                    animator.SetBool("walking", false);
                     path = null;
                     return;
                 }
@@ -45,10 +49,16 @@ public class PlayerController : MonoBehaviour
     {
         this.path = path;
         i = 0;
+        animator.SetBool("walking", true);
     }
     
     public void ActiveAxe()
     {
         playersAxe.SetActive(true);
+    }
+
+    public void SetBagActive(bool value)
+    {
+        bag.SetActive(value);
     }
 }
