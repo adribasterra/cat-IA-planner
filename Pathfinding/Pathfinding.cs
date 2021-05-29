@@ -89,6 +89,7 @@ public class Pathfinding : MonoBehaviour
 
     bool PathInvalid()
     {
+        if (CurrentStartNode == null || CurrentTargetNode == null) return true;
         return CurrentStartNode != Grid.NodeFromWorldPoint(mSeeker.position) || CurrentTargetNode != Grid.NodeFromWorldPoint(mTarget.position) ;
     }
 
