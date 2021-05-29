@@ -7,7 +7,6 @@ public class MichiController : MonoBehaviour
     public Pathfinding pathfinding;
     private Animator animator;
     private List<NodePathfinding> path;
-    private bool hasArrived;
     private int i;
     private Vector3 newPos;
 
@@ -17,7 +16,6 @@ public class MichiController : MonoBehaviour
     void Start()
     {
         animator = this.GetComponent<Animator>();
-        hasArrived = false;
         i = 0;
         path = null;
     }
@@ -25,54 +23,45 @@ public class MichiController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (hasArrived)   // Create new path
+        if (path == null)   // Create new path
         {
-            hasArrived = false;
+            if(i != 0 && !animator.GetAnimatorTransitionInfo(0).IsName("miau -> idle")) return;
             // Calculate new random position
             float xDist = Random.Range(0.0f, 15.0f);
             float zDist = Random.Range(0.0f, 15.0f);
 
-            newPos = new Vector3(xDist, 0.2f, zDist);
+            newPos = new Vector3(xDist, 0.26f, zDist);
             Debug.Log("michi newpos: " + newPos);
             animator.SetBool("walking", true);
-
-            //Transform target = this.transform;
-            //target.position = newPos;
-
-            //if(pathfinding.InitPathfinding(this.transform, target))
-            //{
-            //    path = pathfinding.GetGrid().path;
-            //    animator.SetBool("walking", true);
-            //}
+            path = pathfinding.FindPath(this.transform.position, newPos, -1);
         }
         else
         {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, newPos, walkSpeed * Time.deltaTime);
-            this.transform.LookAt(newPos);
+            //this.transform.position = Vector3.MoveTowards(this.transform.position, newPos, walkSpeed * Time.deltaTime);
+            //this.transform.LookAt(newPos);
 
-            if(transform.position == newPos)
-            {
-                hasArrived = true;
-                animator.SetBool("walking", false);
-                animator.SetTrigger("hasArrived");
-            }
-
-            //if (this.transform.position == path[i].mWorldPosition)
+            //if (Vector3.Distance(transform.position, newPos) < 4f)
             //{
-            //    i++;
-            //    if (i >= path.Count)
-            //    {
-            //        animator.SetBool("walking", false);
-            //        animator.SetTrigger("hasArrived");
-            //        path = null;
-            //        i = 0;
-            //        return;
-            //    }
+            //    path = null;
+            //    animator.SetBool("walking", false);
+            //    animator.SetTrigger("hasArrived");
             //}
 
-            //this.transform.position = Vector3.MoveTowards(this.transform.position, path[i].mWorldPosition, walkSpeed * Time.deltaTime);
-            //this.transform.LookAt(path[path.Count - 1].mWorldPosition);
+            if (Vector3.Distance(this.transform.position, path[i].mWorldPosition) < 1f)
+            {
+                i++;
+                if (i >= path.Count)
+                {
+                    animator.SetBool("walking", false);
+                    animator.SetTrigger("hasArrived");
+                    path = null;
+                    i = 0;
+                    return;
+                }
+            }
 
+            this.transform.position = Vector3.MoveTowards(this.transform.position, path[i].mWorldPosition, walkSpeed * Time.deltaTime);
+            this.transform.LookAt(path[i].mWorldPosition);
         }
     }
 }

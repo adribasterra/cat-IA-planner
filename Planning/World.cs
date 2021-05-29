@@ -85,7 +85,7 @@ public class World : MonoBehaviour
         World.WorldState.WORLD_STATE_NONE,
         World.WorldState.WORLD_STATE_HAS_WOOD,
         World.WorldState.WORLD_STATE_NONE,                // PODRÍA PONER QUE SE ROMPA EL HACHA Y A BUSCARTE LA VIDA BUDDY
-        CalculateDynamicCost(GetNearestTreePosition(), 10.0f), "Fell tree")
+        /*CalculateDynamicCost(GetNearestTreePosition(), 10.0f)*/10f, "Fell tree")
         );
 
         mActionList.Add(
@@ -197,7 +197,7 @@ public class World : MonoBehaviour
             // TODO: TAMBIÉN LOS PUTOS HIJOS ME CAGO EN LA PUTA
             pathfinding.GetGrid().UpdateGrid();
 
-            if (pathfinding.FindPath(feller.transform.position, tree.transform.position.normalized, 0))
+            if (pathfinding.FindPath(feller.transform.position, tree.transform.position.normalized, -1) != null)
             {
                 float dist = Mathf.Abs(Vector3.Distance(feller.transform.position, tree.transform.position));
                 if (minDistance > dist)
@@ -220,6 +220,7 @@ public class World : MonoBehaviour
 
     private float CalculateDynamicCost(GameObject target, float baseCost)
     {
+        Debug.Log(target.name);
         float result = baseCost;
         if (target)
         {

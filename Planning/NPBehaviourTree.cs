@@ -628,8 +628,8 @@ public class NPBehaviourTree : MonoBehaviour
                                         // If execution succeeded return "success". Otherwise return "failed".
                                         if (Time.time > (mTimeStartAction + mTimeActionLast * step / 4))
                                         {
-
-                                            mPlanner.GetWorld().cottage.transform.GetChild(step - 1).gameObject.SetActive(true);
+                                            GameObject stepObject = mPlanner.GetWorld().cottage.transform.GetChild(step - 1).gameObject;
+                                            stepObject.GetComponent<MeshRenderer>().enabled = true;
                                             mPlanner.GetWorld().feller.GetComponent<PlayerController>().SetBagActive(false);
                                             Debug.Log(step++);
                                             

@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     {
         if (path != null)
         {
-            if(this.transform.position == path[i].mWorldPosition)
+            if (Vector3.Distance(this.transform.position, path[i].mWorldPosition) < 1f)
             {
                 i++;
                 if(i >= path.Count)

@@ -78,7 +78,7 @@ public class Pathfinding : MonoBehaviour
 
     public bool InitPathfinding(Transform seeker, Transform target)
     {
-        bool success = false;
+        List<NodePathfinding> success = null;
         mSeeker = seeker;
         mTarget = target;
         // Positions changed?
@@ -118,7 +118,7 @@ public class Pathfinding : MonoBehaviour
                 }   
             }
         }
-        return success;
+        return (success != null ? true : false);
 	}
 
     /***************************************************************************/
@@ -138,10 +138,8 @@ public class Pathfinding : MonoBehaviour
 
     /***************************************************************************/
 
-	public bool FindPath( Vector3 startPos, Vector3 targetPos, int iterations = 0 )
+	public List<NodePathfinding> FindPath( Vector3 startPos, Vector3 targetPos, int iterations )
     {
-        bool success = false;
-
 		CurrentStartNode  = Grid.NodeFromWorldPoint(startPos);
 		CurrentTargetNode = Grid.NodeFromWorldPoint(targetPos);
 
@@ -200,7 +198,6 @@ public class Pathfinding : MonoBehaviour
             else
             {
                 // Path found!
-                success = true;
                 RetracePath(CurrentStartNode, CurrentTargetNode);
                 // Path found
                 Iterations = -1;
@@ -211,7 +208,7 @@ public class Pathfinding : MonoBehaviour
                 //Debug.LogFormat("\tClosed nodes: {0}", closedSet.Count );
             }
 		}
-        return success;
+        return Grid.path;
 	}
 
     /***************************************************************************/
@@ -235,7 +232,43 @@ public class Pathfinding : MonoBehaviour
 
     /***************************************************************************/
 
-	float GetDistance(NodePathfinding nodeA, NodePathfinding nodeB)
+    void SmoothPath(List<NodePathfinding> path)
+    {
+        List<NodePathfinding> prevList   = new List<NodePathfinding>();
+        List<NodePathfinding> resultList = new List<NodePathfinding>();
+        List<NodePathfinding> auxList    = new List<NodePathfinding>();
+
+        NodePathfinding startNode = path[0];
+        NodePathfinding endNode   = path[path.Count - 1];
+        prevList = path;
+        prevList.Reverse();
+
+        resultList.Add(startNode);  // Add first node
+
+        // Until all nodes have been checked
+        while(endNode != startNode)
+        {
+            foreach (NodePathfinding node in prevList)
+            {
+                if (BresenhamWalkable(startNode.mGridX, startNode.mGridY, node.mGridX, node.mGridY))
+                {
+                    startNode = node;
+                    resultList.Add(node);
+                    prevList = new List<NodePathfinding>(auxList);
+                    auxList.Clear();
+                    break;
+                }
+                auxList.Add(node);
+            }
+        }
+        resultList.Add(endNode);  // Add last node
+
+        Grid.path = resultList;
+    }
+
+    /***************************************************************************/
+
+    float GetDistance(NodePathfinding nodeA, NodePathfinding nodeB)
     {
         float distance = 0.0f;
         float distanceBtwNodes = 1f;
@@ -287,44 +320,6 @@ public class Pathfinding : MonoBehaviour
         }
         
         return distance;
-    }
-
-    /***************************************************************************/
-
-    void SmoothPath(List<NodePathfinding> path)
-    {
-        List<NodePathfinding> prevList   = new List<NodePathfinding>();
-        List<NodePathfinding> resultList = new List<NodePathfinding>();
-        List<NodePathfinding> auxList    = new List<NodePathfinding>();
-
-        NodePathfinding startNode = path[0];
-        NodePathfinding endNode = path[path.Count - 1];
-        prevList = path;
-        prevList.Reverse();
-
-        resultList.Add(startNode);
-
-        // Do this until endNode == startNode
-        for (int a = 0; a < 10000; a++)
-        {
-            foreach (NodePathfinding node in prevList)
-            {
-                if (BresenhamWalkable(startNode.mGridX, startNode.mGridY, node.mGridX, node.mGridY))
-                {
-                    startNode = node;
-                    resultList.Add(node);
-                    prevList = new List<NodePathfinding>(auxList);
-                    auxList.Clear();
-                    break;
-                }
-                auxList.Add(node);
-            }
-            // All nodes have been checked, break the for
-            if (endNode == startNode) a = 999999;
-        }
-        resultList.Add(endNode);
-
-        Grid.path = resultList;
     }
 
     /***************************************************************************/
