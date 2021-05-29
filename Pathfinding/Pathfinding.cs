@@ -4,10 +4,8 @@ using System.Collections.Generic;
 
 public class Pathfinding : MonoBehaviour
 {
-    [HideInInspector]
-    public Transform mSeeker;
-    [HideInInspector]
-    public Transform mTarget;
+    [HideInInspector] public Transform mSeeker;
+    [HideInInspector] public Transform mTarget;
 
     public bool EightConnectivity = true;
     public bool smoothPath;
@@ -31,6 +29,51 @@ public class Pathfinding : MonoBehaviour
         LastStepTime = 0.0f;
     }
 
+    /***************************************************************************/
+
+    #region Previous Update func
+    //private void Update()
+    //{
+    //    // Positions changed?
+    //    if (PathInvalid())
+    //    {
+    //        // Remove old path
+    //        if (Grid.path != null)
+    //        {
+    //            Grid.path.Clear();
+    //        }
+    //        // Start calculating path again
+    //        Iterations = -1;
+    //        if (TimeBetweenSteps == 20.0f)
+    //        {
+    //            Iterations = -1;
+    //        }
+    //        FindPath(mSeeker.position, mTarget.position, Iterations);
+    //    }
+    //    else
+    //    {
+    //        // Path found?
+    //        if (Iterations >= 0)
+    //        {
+    //            // One or more iterations?
+    //            if (TimeBetweenSteps == 0.0f)
+    //            {
+    //                // One iteration, look until path is found
+    //                Iterations = -1;
+    //                FindPath(mSeeker.position, mTarget.position, Iterations);
+    //            }
+    //            else if (Time.time > LastStepTime + TimeBetweenSteps)
+    //            {
+    //                // Iterate increasing depth every time step
+    //                LastStepTime = Time.time;
+    //                Iterations++;
+    //                FindPath(mSeeker.position, mTarget.position, Iterations);
+    //            }
+    //        }
+    //    }
+    //}
+    #endregion
+    
     /***************************************************************************/
 
     public bool InitPathfinding(Transform seeker, Transform target)
@@ -187,8 +230,7 @@ public class Pathfinding : MonoBehaviour
         path.Reverse();
 
         if(smoothPath) SmoothPath(path);
-
-        Grid.path = path;
+        else Grid.path = path;
     }
 
     /***************************************************************************/
@@ -204,7 +246,9 @@ public class Pathfinding : MonoBehaviour
         if ( EightConnectivity )
         {
             //Euclidean distance
-            distance = distanceBtwNodes * Mathf.Sqrt(distX * distX + distY * distY);
+            int verticalDist = Mathf.Abs(nodeA.mGridY - nodeB.mGridY);
+            int horizontalDist = Mathf.Abs(nodeA.mGridX - nodeB.mGridX);
+            return Mathf.Sqrt(Mathf.Pow(verticalDist, 2) + Mathf.Pow(horizontalDist, 2));
         }
         else
         {
@@ -249,86 +293,58 @@ public class Pathfinding : MonoBehaviour
 
     void SmoothPath(List<NodePathfinding> path)
     {
-        List<int> smoothNodes = new List<int>();
-        NodePathfinding node = path[0];
-        smoothNodes.Add(0);
-        int i = path.Count;
+        List<NodePathfinding> prevList   = new List<NodePathfinding>();
+        List<NodePathfinding> resultList = new List<NodePathfinding>();
+        List<NodePathfinding> auxList    = new List<NodePathfinding>();
 
-        while (node != path[path.Count - 1])
-        {
-            i--;
-            if (BresenhamWalkable(node.mGridX, node.mGridY, path[i].mGridX, path[i].mGridY))
-            {
-                smoothNodes.Add(i);
-                node = path[i];
-                i = path.Count;
-            }
-        }
+        NodePathfinding startNode = path[0];
+        NodePathfinding endNode = path[path.Count - 1];
+        prevList = path;
+        prevList.Reverse();
 
-        for (int j = path.Count - 1; j > 0; j--)
+        resultList.Add(startNode);
+
+        // Do this until endNode == startNode
+        for (int a = 0; a < 10000; a++)
         {
-            if (!smoothNodes.Contains(j))
+            foreach (NodePathfinding node in prevList)
             {
-                path.Remove(path[j]);
+                if (BresenhamWalkable(startNode.mGridX, startNode.mGridY, node.mGridX, node.mGridY))
+                {
+                    startNode = node;
+                    resultList.Add(node);
+                    prevList = new List<NodePathfinding>(auxList);
+                    auxList.Clear();
+                    break;
+                }
+                auxList.Add(node);
             }
+            // All nodes have been checked, break the for
+            if (endNode == startNode) a = 999999;
         }
+        resultList.Add(endNode);
+
+        Grid.path = resultList;
     }
-
-    //void SmoothPath(List<NodePathfinding> path)
-    //{
-    //    List<int> removables = new List<int>();
-    //    NodePathfinding node = path[0];
-    //    removables.Add(0);
-
-    //    for(int i = 1; i<path.Count; i++)
-    //    {
-    //        if(BresenhamWalkable(node.mGridX, node.mGridY, path[i].mGridX, path[i].mGridY))
-    //        {
-    //            if (i + 1 < path.Count && BresenhamWalkable(node.mGridX, node.mGridY, path[i + 1].mGridX, path[i + 1].mGridY))
-    //            {
-    //                removables.Add(i);
-    //            }
-    //        }
-    //        else
-    //        {
-    //            // Reset node
-    //            node = path[i];
-    //            removables.Add(i);
-    //        }
-    //    }
-
-    //    for (int j = removables.Count-1; j > 0 ; j--)
-    //    {
-    //        int index = removables[j];
-    //        path.Remove(path[index]);
-    //    }
-    //}
 
     /***************************************************************************/
 
     public bool BresenhamWalkable(int x, int y, int x2, int y2)
     {
-        float originalCost = Grid.GetNode(x2, y2).gCost - Grid.GetNode(x, y).gCost;
-        //Debug.Log("x: " + x + "\n\ty: " + y);
-
-        // TODO: 4 Connectivity
-        // TODO: Cost
-        float totalCost = 0f;
-
         int xDist = x2 - x;
         int yDist = y2 - y;
         int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
-        // dx
-        if (xDist < 0) dx1 = -1; else if (xDist > 0) dx1 = 1;
-        if (xDist < 0) dx2 = -1; else if (xDist > 0) dx2 = 1;
-        // dy
-        if (yDist < 0) dy1 = -1; else if (yDist > 0) dy1 = 1;
 
-        int longest = Mathf.Abs(xDist);
+        if (xDist < 0) dx1 = -1; else if (xDist > 0) dx1 = 1;
+        if (yDist < 0) dy1 = -1; else if (yDist > 0) dy1 = 1;
+        if (xDist < 0) dx2 = -1; else if (xDist > 0) dx2 = 1;
+
+        int longest  = Mathf.Abs(xDist);
         int shortest = Mathf.Abs(yDist);
+
         if (!(longest > shortest))
         {
-            longest = Mathf.Abs(yDist);
+            longest  = Mathf.Abs(yDist);
             shortest = Mathf.Abs(xDist);
             if (yDist < 0)
             {
@@ -340,6 +356,7 @@ public class Pathfinding : MonoBehaviour
             }
             dx2 = 0;
         }
+
         int numerator = longest >> 1;
         for (int i = 0; i <= longest; i++)
         {
@@ -347,9 +364,6 @@ public class Pathfinding : MonoBehaviour
             {
                 return false;
             }
-
-            //Add cost
-            totalCost += Grid.GetNode(x, y).gCost;
 
             numerator += shortest;
             if (!(numerator < longest))
@@ -364,14 +378,6 @@ public class Pathfinding : MonoBehaviour
                 y += dy2;
             }
         }
-
-        //Debug.Log("Total: " + totalCost + "\n\tOriginal: " + originalCost);
-
-        if (totalCost > originalCost)
-        {
-            return false;
-        }
-
 
         return true;
     }
