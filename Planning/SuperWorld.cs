@@ -19,8 +19,9 @@ public class SuperWorld : MonoBehaviour
     private GameObject trunk;
     private GameObject wood;
 
-    public float hunger = 0f;
-    public int timesLeftToBuildCottage = 4;
+    [HideInInspector] public float hunger = 0f;
+    [HideInInspector] public int maxTimesToBuildCottage = 2;
+    [HideInInspector] public int timesLeftToBuildCottage;
 
     /***************************************************************************/
 
@@ -35,19 +36,19 @@ public class SuperWorld : MonoBehaviour
         WORLD_STATE_COTTAGE_BUILT       = 16,
         WORLD_STATE_FOX_DEAD            = 32,
         WORLD_STATE_HAS_MEAT            = 64,
-        WORLD_STATE_MEAT_EATEN          = 128,
 
         //Behaviour tree WS
-        WORLD_STATE_CLOSE_TO_AXE        = 256,
-        WORLD_STATE_FIRE_ON             = 512,
-        WORLD_STATE_HAS_RAW_MEAT        = 1024,
-        WORLD_STATE_HAS_COOKED_MEAT     = 2048,
-        WORLD_STATE_TREE_FELLED         = 4096,
-        WORLD_STATE_CLOSE_TO_COTTAGE    = 8192,
+        WORLD_STATE_CLOSE_TO_AXE        = 128,
+        WORLD_STATE_FIRE_ON             = 256,
+        WORLD_STATE_HAS_RAW_MEAT        = 512,
+        WORLD_STATE_HAS_COOKED_MEAT     = 1024,
+        WORLD_STATE_TREE_FELLED         = 2048,
+        WORLD_STATE_CLOSE_TO_COTTAGE    = 4096,
     }
 
     void Awake()
     {
+        timesLeftToBuildCottage = maxTimesToBuildCottage;
         trees = GameObject.FindGameObjectsWithTag("Tree");
         fellingTree = null;
     }
@@ -148,6 +149,7 @@ public class SuperWorld : MonoBehaviour
         if (tree != null)
         {
             tree.SetActive(false);
+            tree = null;
             trunk.SetActive(true);
         }
         else Debug.Log("tree is NULL");
@@ -171,5 +173,10 @@ public class SuperWorld : MonoBehaviour
             fellingTree = null;
         }
         else Debug.Log("wood is NULL");
+    }
+
+    public void ResetWorld()
+    {
+
     }
 }

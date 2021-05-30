@@ -362,7 +362,6 @@ public class NPBehaviourTree : MonoBehaviour
                           ),// Sequence - FELL TREE
 
                           new Sequence(                             // EAT RAW MEAT
-    // TODO: as effects, increment hunger
                             new Action((bool eatRawMeat) =>
                             {
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_RAW_MEAT)
@@ -498,7 +497,6 @@ public class NPBehaviourTree : MonoBehaviour
                             })
                             { Label = "Cook meat" },
                             // Action 2
-    // TODO: as effects, increment hunger
                             new Action((bool eatCookedMeat) =>
                             {
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT)
@@ -610,7 +608,6 @@ public class NPBehaviourTree : MonoBehaviour
                             })
                             { Label = "Go to cottage" },
                             // Action 1
-    // TODO: make timesLeftToBuildCottage--
                             new Action((bool buildCottage) =>
                             {
                                 if (mPlan[mCurrentAction].mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE)

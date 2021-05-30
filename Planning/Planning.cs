@@ -75,19 +75,12 @@ public class Planning : MonoBehaviour
             // Check destination
             if (((node.superWorld.mWorldState & CurrentTargetNode.superWorld.mWorldState) != CurrentTargetNode.superWorld.mWorldState))
             {
-
                 // Open neighbours
                 foreach (NodePlanning neighbour in mWorld.GetNeighbours(node))
                 {
                     if ( /*!neighbour.mWalkable ||*/ closedSet.Any(n => n.superWorld.mWorldState == neighbour.superWorld.mWorldState))
                     {
                         continue;
-                    }
-                    //Debug.Log(neighbour.mAction.mActionType);
-                    if (neighbour.mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE)
-                    {
-                        superWorld.timesLeftToBuildCottage = 0;
-                        //Debug.Log(mWorld.timesLeftToBuildCottage);
                     }
 
                     float newCostToNeighbour = node.gCost + GetDistance(node, neighbour);
@@ -144,6 +137,8 @@ public class Planning : MonoBehaviour
         {
             Debug.Log("ERROR: IMPOSSIBLE TO FIND PLAN");
         }
+
+        superWorld.ResetWorld();
 
         return mWorld.plan;
     }

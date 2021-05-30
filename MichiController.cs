@@ -31,7 +31,7 @@ public class MichiController : MonoBehaviour
             float zDist = Random.Range(0.0f, 15.0f);
 
             newPos = new Vector3(xDist, 0.26f, zDist);
-            Debug.Log("michi newpos: " + newPos);
+            //Debug.Log("michi newpos: " + newPos);
             animator.SetBool("walking", true);
             path = new List<NodePathfinding>();
             //path = pathfinding.FindPath(this.transform.position, newPos, -1);

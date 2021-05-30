@@ -34,7 +34,7 @@ public class World : MonoBehaviour
         SuperWorld.WorldState.WORLD_STATE_AXE_OWNED,
         SuperWorld.WorldState.WORLD_STATE_AXE_OWNED,
         SuperWorld.WorldState.WORLD_STATE_NONE,
-        CalculateDynamicCost(superWorld.axe, 5.0f), "Pick up axe")
+        5.0f, "Pick up axe")
         );
 
         mActionList.Add(
@@ -54,7 +54,7 @@ public class World : MonoBehaviour
         SuperWorld.WorldState.WORLD_STATE_FOX_DEAD,
         SuperWorld.WorldState.WORLD_STATE_FOX_DEAD | SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
         SuperWorld.WorldState.WORLD_STATE_NONE,
-        CalculateDynamicCost(superWorld.fox, 20.0f), "Kill fox")
+        20.0f, "Kill fox")
         );
 
         mActionList.Add(
@@ -62,7 +62,7 @@ public class World : MonoBehaviour
         ActionPlanning.ActionType.ACTION_TYPE_EAT_RAW_MEAT,
         SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
         SuperWorld.WorldState.WORLD_STATE_NONE,
-        SuperWorld.WorldState.WORLD_STATE_MEAT_EATEN,              // HUNGER++
+        SuperWorld.WorldState.WORLD_STATE_NONE,              // HUNGER++
         SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
         5.0f, "Eat raw meat")
         );
@@ -72,7 +72,7 @@ public class World : MonoBehaviour
         ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT,
         SuperWorld.WorldState.WORLD_STATE_HAS_MEAT | SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
         SuperWorld.WorldState.WORLD_STATE_NONE,
-        SuperWorld.WorldState.WORLD_STATE_MEAT_EATEN,              // HUNGER++++
+        SuperWorld.WorldState.WORLD_STATE_NONE,              // HUNGER++++
         SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
         15.0f, "Eat cooked meat")
         );
@@ -82,9 +82,9 @@ public class World : MonoBehaviour
         ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE,
         SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
         SuperWorld.WorldState.WORLD_STATE_NONE,
-        SuperWorld.WorldState.WORLD_STATE_COTTAGE_BUILT,           // COTTAGE++
+        SuperWorld.WorldState.WORLD_STATE_NONE,           // COTTAGE++
         SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
-        CalculateDynamicCost(superWorld.cottage, 25.0f), "Building cottage")
+        25.0f, "Building cottage")
         );
         #endregion
         
@@ -101,43 +101,57 @@ public class World : MonoBehaviour
 
         foreach (ActionPlanning action in mActionList)
         {
-            if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT) superWorld.hunger += 20;
-            if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE) superWorld.timesLeftToBuildCottage--;
-
-            if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_GO_TO_TREE) {
-                superWorld.GetNearestTreePosition();
-            }
-
-
-
             // If preconditions are met we can apply effects and the new state is valid
             if ((node.superWorld.mWorldState & action.mPreconditions) == action.mPreconditions &&
-                (node.superWorld.mWorldState & action.mNegativePreconditions) == SuperWorld.WorldState.WORLD_STATE_NONE )
+                (node.superWorld.mWorldState & action.mNegativePreconditions) == SuperWorld.WorldState.WORLD_STATE_NONE &&
+                 node.superWorld.hunger < 100f)
                 //Aquí van los efectos del world absoluto y de los worlds hijos
             {
                 SuperWorld aux = new SuperWorld(superWorld);
                 aux.hunger += action.mCost;
 
-                if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT)
+                // Calculate dynamic costs
+                GameObject target = null;
+                switch (action.mActionType)
                 {
-                    aux.hunger -= 40;
-                }
-                if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_RAW_MEAT)
-                {
-                    aux.hunger -= 10;
-                }
-                if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE && superWorld.timesLeftToBuildCottage < 4)
-                {
-                    aux.timesLeftToBuildCottage--;
-                }
+                    case ActionPlanning.ActionType.ACTION_TYPE_PICK_UP_AXE:
+                        target = this.superWorld.axe;
+                        break;
+                    //case ActionPlanning.ActionType.ACTION_TYPE_FELL_TREE:
+                    //    target = this.superWorld.GetNearestTreePosition();
+                    //    break;
+                    case ActionPlanning.ActionType.ACTION_TYPE_HAUNT:
+                        target = this.superWorld.fox;
+                        break;
 
+                    // Update global vars
+                    case ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT:
+                        aux.hunger -= 40;
+                        break;
+                    case ActionPlanning.ActionType.ACTION_TYPE_EAT_RAW_MEAT:
+                        aux.hunger -= 10;
+                        break;
+                }
+                if(target != null) action.mCost = CalculateDynamicCost(aux, target, action.mCost); Debug.Log(action.mActionType + " :" + action.mCost);
+                
                 // Apply positive effects
                 SuperWorld.WorldState positiveEffectsWorldState = (node.superWorld.mWorldState | action.mEffects);
+
+                if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE/* && node.superWorld.timesLeftToBuildCottage > 0*/)
+                {
+                    aux.timesLeftToBuildCottage--;
+
+                    if (node.superWorld.timesLeftToBuildCottage <= 0)
+                    {
+                        positiveEffectsWorldState |= SuperWorld.WorldState.WORLD_STATE_COTTAGE_BUILT;
+                    }
+                }
+
                 // Apply negative effects
                 aux.mWorldState = positiveEffectsWorldState & ~action.mNegativeEffects;
 
                 NodePlanning newNodePlanning = new NodePlanning(aux, action);
-
+                Debug.Log(action.mActionType + ": " + aux.mWorldState);
                 neighbours.Add(newNodePlanning);
             }
         }
@@ -154,7 +168,7 @@ public class World : MonoBehaviour
 
     /***************************************************************************/
 
-    private float CalculateDynamicCost(GameObject target, float baseCost)
+    private float CalculateDynamicCost(SuperWorld superWorld, GameObject target, float baseCost)
     {
         float result = baseCost;
         if (target)
@@ -162,6 +176,7 @@ public class World : MonoBehaviour
             result = baseCost + Mathf.Abs(Vector3.Distance(superWorld.feller.transform.position, target.transform.position)) * (superWorld.hunger < 1 ? 1: superWorld.hunger);
         }
         else Debug.Log("TARGET IS NULL");
+        Debug.Log("Cost result: " + result);
         return result;
     }
 
