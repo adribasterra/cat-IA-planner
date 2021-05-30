@@ -6,7 +6,7 @@ public class SuperWorld : MonoBehaviour
 {
     [HideInInspector] public GameObject[] trees;
     [HideInInspector] public WorldState mWorldState;
-    public Pathfinding pathfinding;
+    [HideInInspector] public Pathfinding pathfinding;
 
     [Header("Elements")]
     public GameObject fox;
@@ -51,6 +51,7 @@ public class SuperWorld : MonoBehaviour
     void Awake()
     {
         timesLeftToBuildCottage = maxTimesToBuildCottage;
+        pathfinding = this.GetComponent<Pathfinding>();
         trees = GameObject.FindGameObjectsWithTag("Tree");
         fellingTree = null;
     }

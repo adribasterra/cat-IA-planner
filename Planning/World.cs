@@ -82,7 +82,7 @@ public class World : MonoBehaviour
         ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE,
         SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
         SuperWorld.WorldState.WORLD_STATE_NONE,
-        SuperWorld.WorldState.WORLD_STATE_NONE,             // COTTAGE++
+        SuperWorld.WorldState.WORLD_STATE_NONE,             // COTTAGE--
         SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
         25.0f, "Building cottage")
         );
