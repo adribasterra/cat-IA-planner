@@ -5,6 +5,7 @@ using System.Linq;
 
 public class Planning : MonoBehaviour
 {
+    [HideInInspector] public SuperWorld superWorld;
     NodePlanning CurrentStartNode;
     NodePlanning CurrentTargetNode;
 
@@ -15,13 +16,14 @@ public class Planning : MonoBehaviour
     void Awake()
     {
         mWorld = GetComponent<World>();
+        superWorld = this.GetComponent<SuperWorld>();
     }
 
     /***************************************************************************/
 
     public List<NodePlanning> GetPlan()
     {
-        FindPlan(World.WorldState.WORLD_STATE_NONE, World.WorldState.WORLD_STATE_COTTAGE_BUILT);
+        FindPlan(SuperWorld.WorldState.WORLD_STATE_NONE, SuperWorld.WorldState.WORLD_STATE_COTTAGE_BUILT);
 
         return mWorld.plan;
     }
@@ -34,7 +36,7 @@ public class Planning : MonoBehaviour
 
     /***************************************************************************/
 
-    public List<NodePlanning> FindPlan(World.WorldState startWorldState, World.WorldState targetWorldState)
+    public List<NodePlanning> FindPlan(SuperWorld.WorldState startWorldState, SuperWorld.WorldState targetWorldState)
     {
         CurrentStartNode = new NodePlanning(startWorldState, null);
         CurrentTargetNode = new NodePlanning(targetWorldState, null);
@@ -78,7 +80,7 @@ public class Planning : MonoBehaviour
                     //Debug.Log(neighbour.mAction.mActionType);
                     if (neighbour.mAction.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE)
                     {
-                        mWorld.timesLeftToBuildCottage = 0;
+                        superWorld.timesLeftToBuildCottage = 0;
                         //Debug.Log(mWorld.timesLeftToBuildCottage);
                     }
 
@@ -168,9 +170,9 @@ public class Planning : MonoBehaviour
 
     /***************************************************************************/
 
-    public World GetWorld()
+    public SuperWorld GetWorld()
     {
-        return mWorld;
+        return superWorld;
     }
 
     /***************************************************************************/

@@ -9,57 +9,16 @@ public class World : MonoBehaviour
     [HideInInspector] public HashSet<NodePlanning> closedSet;
     [HideInInspector] public List<NodePlanning> openSet;
     [HideInInspector] public List<NodePlanning> plan;
-    [HideInInspector] public WorldState mWorldState;
-    [HideInInspector] public GameObject[] trees;
-
-    [Header("Elements")]
-    public GameObject fox;
-    public GameObject axe;
-    public GameObject cottage;
-    public GameObject feller;
+    [HideInInspector] public SuperWorld superWorld;
 
     private Pathfinding pathfinding;
-    private World world;
-
-    private GameObject fellingTree;
-    private GameObject tree;
-    private GameObject trunk;
-    private GameObject wood;
-
-    public float hunger = 0f;
-    public int timesLeftToBuildCottage = 1;
-
-    /***************************************************************************/
-
-    [System.Flags]
-    public enum WorldState
-    {
-        WORLD_STATE_NONE = 0,
-        WORLD_STATE_AXE_OWNED = 1,
-        WORLD_STATE_CLOSE_TO_FOX = 2,
-        WORLD_STATE_CLOSE_TO_TREE = 4,
-        WORLD_STATE_HAS_WOOD = 8,
-        WORLD_STATE_COTTAGE_BUILT = 16,
-        WORLD_STATE_FOX_DEAD = 32,
-        WORLD_STATE_HAS_MEAT = 64,
-        WORLD_STATE_MEAT_EATEN = 128,
-
-        //Behaviour tree WS
-        WORLD_STATE_CLOSE_TO_AXE = 256,
-        WORLD_STATE_FIRE_ON = 512,
-        WORLD_STATE_HAS_RAW_MEAT = 1024,
-        WORLD_STATE_HAS_COOKED_MEAT = 2048,
-        WORLD_STATE_TREE_FELLED = 4096,
-        WORLD_STATE_CLOSE_TO_COTTAGE = 8192,
-    }
 
     /***************************************************************************/
 
     void Awake()
     {
         pathfinding = this.GetComponent<Pathfinding>();
-        trees = GameObject.FindGameObjectsWithTag("Tree");
-        fellingTree = null;
+        superWorld = this.GetComponent<SuperWorld>();
 
         mActionList = new List<ActionPlanning>();
         /************************************************/
@@ -71,61 +30,61 @@ public class World : MonoBehaviour
         mActionList.Add(
         new ActionPlanning(
         ActionPlanning.ActionType.ACTION_TYPE_PICK_UP_AXE,
-        World.WorldState.WORLD_STATE_NONE,
-        World.WorldState.WORLD_STATE_AXE_OWNED,
-        World.WorldState.WORLD_STATE_AXE_OWNED,
-        World.WorldState.WORLD_STATE_NONE,
-        CalculateDynamicCost(axe, 5.0f), "Pick up axe")
+        SuperWorld.WorldState.WORLD_STATE_NONE,
+        SuperWorld.WorldState.WORLD_STATE_AXE_OWNED,
+        SuperWorld.WorldState.WORLD_STATE_AXE_OWNED,
+        SuperWorld.WorldState.WORLD_STATE_NONE,
+        CalculateDynamicCost(superWorld.axe, 5.0f), "Pick up axe")
         );
 
         mActionList.Add(
         new ActionPlanning(
         ActionPlanning.ActionType.ACTION_TYPE_FELL_TREE,
-        World.WorldState.WORLD_STATE_AXE_OWNED,
-        World.WorldState.WORLD_STATE_NONE,
-        World.WorldState.WORLD_STATE_HAS_WOOD,
-        World.WorldState.WORLD_STATE_NONE,                // PODRÍA PONER QUE SE ROMPA EL HACHA Y A BUSCARTE LA VIDA BUDDY
+        SuperWorld.WorldState.WORLD_STATE_AXE_OWNED,
+        SuperWorld.WorldState.WORLD_STATE_NONE,
+        SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
+        SuperWorld.WorldState.WORLD_STATE_NONE,                // PODRÍA PONER QUE SE ROMPA EL HACHA Y A BUSCARTE LA VIDA BUDDY
         /*CalculateDynamicCost(GetNearestTreePosition(), 10.0f)*/10f, "Fell tree")
         );
 
         mActionList.Add(
         new ActionPlanning(
         ActionPlanning.ActionType.ACTION_TYPE_HAUNT,
-        World.WorldState.WORLD_STATE_AXE_OWNED,
-        World.WorldState.WORLD_STATE_FOX_DEAD,
-        World.WorldState.WORLD_STATE_FOX_DEAD | World.WorldState.WORLD_STATE_HAS_MEAT,
-        World.WorldState.WORLD_STATE_NONE,
-        CalculateDynamicCost(fox, 20.0f), "Kill fox")
+        SuperWorld.WorldState.WORLD_STATE_AXE_OWNED,
+        SuperWorld.WorldState.WORLD_STATE_FOX_DEAD,
+        SuperWorld.WorldState.WORLD_STATE_FOX_DEAD | SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
+        SuperWorld.WorldState.WORLD_STATE_NONE,
+        CalculateDynamicCost(superWorld.fox, 20.0f), "Kill fox")
         );
 
         mActionList.Add(
         new ActionPlanning(
         ActionPlanning.ActionType.ACTION_TYPE_EAT_RAW_MEAT,
-        World.WorldState.WORLD_STATE_HAS_MEAT,
-        World.WorldState.WORLD_STATE_NONE,
-        World.WorldState.WORLD_STATE_MEAT_EATEN,              // HUNGER++
-        World.WorldState.WORLD_STATE_HAS_MEAT,
+        SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
+        SuperWorld.WorldState.WORLD_STATE_NONE,
+        SuperWorld.WorldState.WORLD_STATE_MEAT_EATEN,              // HUNGER++
+        SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
         5.0f, "Eat raw meat")
         );
 
         mActionList.Add(
         new ActionPlanning(
         ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT,
-        World.WorldState.WORLD_STATE_HAS_MEAT | World.WorldState.WORLD_STATE_HAS_WOOD,
-        World.WorldState.WORLD_STATE_NONE,
-        World.WorldState.WORLD_STATE_MEAT_EATEN,              // HUNGER++++
-        World.WorldState.WORLD_STATE_HAS_MEAT,
+        SuperWorld.WorldState.WORLD_STATE_HAS_MEAT | SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
+        SuperWorld.WorldState.WORLD_STATE_NONE,
+        SuperWorld.WorldState.WORLD_STATE_MEAT_EATEN,              // HUNGER++++
+        SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
         15.0f, "Eat cooked meat")
         );
 
         mActionList.Add(
         new ActionPlanning(
         ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE,
-        World.WorldState.WORLD_STATE_HAS_WOOD,
-        World.WorldState.WORLD_STATE_NONE,
-        World.WorldState.WORLD_STATE_COTTAGE_BUILT,           // COTTAGE++
-        World.WorldState.WORLD_STATE_HAS_WOOD,
-        CalculateDynamicCost(cottage, 25.0f), "Building cottage")
+        SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
+        SuperWorld.WorldState.WORLD_STATE_NONE,
+        SuperWorld.WorldState.WORLD_STATE_COTTAGE_BUILT,           // COTTAGE++
+        SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
+        CalculateDynamicCost(superWorld.cottage, 25.0f), "Building cottage")
         );
         #endregion
         
@@ -142,30 +101,42 @@ public class World : MonoBehaviour
 
         foreach (ActionPlanning action in mActionList)
         {
-            bool hasEnoughEnergy = hunger + action.mCost < 100;
-            
-            hunger += action.mCost;
-            //Debug.Log(hunger);
-
-            if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT) hunger += 40;
-            if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT) hunger += 20;
-            if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE) timesLeftToBuildCottage--;
-
+            if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT) superWorld.hunger += 20;
+            if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE) superWorld.timesLeftToBuildCottage--;
 
             if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_GO_TO_TREE) {
-                GetNearestTreePosition();
+                superWorld.GetNearestTreePosition();
             }
+
 
 
             // If preconditions are met we can apply effects and the new state is valid
             if ((node.mWorldState & action.mPreconditions) == action.mPreconditions &&
-                (node.mWorldState & action.mNegativePreconditions) == World.WorldState.WORLD_STATE_NONE )
+                (node.mWorldState & action.mNegativePreconditions) == SuperWorld.WorldState.WORLD_STATE_NONE )
                 //Aquí van los efectos del world absoluto y de los worlds hijos
             {
+                SuperWorld aux = new SuperWorld(superWorld);
+                aux.hunger += action.mCost;
+
+                if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT)
+                {
+                    aux.hunger -= 40;
+                }
+                if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_EAT_RAW_MEAT)
+                {
+                    aux.hunger -= 10;
+                }
+                if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE && superWorld.timesLeftToBuildCottage < 4)
+                {
+                    aux.timesLeftToBuildCottage--;
+                }
+
                 // Apply positive effects
-                World.WorldState positiveEffectsWorldState = (node.mWorldState | action.mEffects);
+                SuperWorld.WorldState positiveEffectsWorldState = (node.mWorldState | action.mEffects);
                 // Apply negative effects
-                World.WorldState finalWorldState = positiveEffectsWorldState & ~action.mNegativeEffects;
+                SuperWorld.WorldState finalWorldState = positiveEffectsWorldState & ~action.mNegativeEffects;
+
+                // Create new superWorld
 
                 NodePlanning newNodePlanning = new NodePlanning(finalWorldState, action);
 
@@ -185,89 +156,17 @@ public class World : MonoBehaviour
 
     /***************************************************************************/
 
-    public GameObject GetNearestTreePosition()
-    {
-        GameObject result = trees[0];
-        float minDistance = float.MaxValue;
-        foreach (GameObject tree in trees)
-        {
-            // Set destination and origin as walkable so taht the pathfinding can find path
-            feller.layer = 0;
-            tree.transform.GetChild(0).GetChild(1).gameObject.layer = 0;
-            // TODO: TAMBIÉN LOS PUTOS HIJOS ME CAGO EN LA PUTA
-            pathfinding.GetGrid().UpdateGrid();
-
-            if (pathfinding.FindPath(feller.transform.position, tree.transform.position.normalized, -1) != null)
-            {
-                float dist = Mathf.Abs(Vector3.Distance(feller.transform.position, tree.transform.position));
-                if (minDistance > dist)
-                {
-                    minDistance = dist;
-                    result = tree;
-                }
-            }
-            else
-            {
-                Debug.Log("Inaccessible tree");
-            }
-            tree.transform.GetChild(0).GetChild(1).gameObject.layer = 8; // Unwalkable
-            pathfinding.GetGrid().UpdateGrid();
-        }
-        return result;
-    }
-
-    /***************************************************************************/
-
     private float CalculateDynamicCost(GameObject target, float baseCost)
     {
-        Debug.Log(target.name);
         float result = baseCost;
         if (target)
         {
-            result = baseCost + Mathf.Abs(Vector3.Distance(feller.transform.position, target.transform.position)) * (hunger < 1 ? 1: hunger);
+            result = baseCost + Mathf.Abs(Vector3.Distance(superWorld.feller.transform.position, target.transform.position)) * (superWorld.hunger < 1 ? 1: superWorld.hunger);
         }
         else Debug.Log("TARGET IS NULL");
         return result;
     }
 
     /***************************************************************************/
-
-    public void SetFellingTree(GameObject tree)
-    {
-        fellingTree = tree;
-        this.tree = fellingTree.transform.Find("Tree").gameObject;
-        wood = fellingTree.transform.Find("Wood").gameObject;
-        trunk = fellingTree.transform.Find("Trunk").gameObject;
-        //Debug.Log("Tree: " + this.tree + ", " + "Wood: " + this.wood + ", " + "Trunk: " + this.trunk + " ");
-    }
-
-    public void FellTree()
-    {
-        if (tree != null)
-        {
-            tree.SetActive(false);
-            trunk.SetActive(true);
-        }
-        else Debug.Log("tree is NULL");
-    }
-
-    public void SetWood()
-    {
-        if (wood != null)
-        {
-            wood.SetActive(true);
-        }
-        else Debug.Log("wood is NULL");
-    }
-
-    public void CollectWood()
-    {
-        if (wood != null)
-        {
-            wood.SetActive(false);
-            wood = null;
-            fellingTree = null;
-        }
-        else Debug.Log("wood is NULL");
-    }
+    
 }

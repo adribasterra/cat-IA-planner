@@ -33,35 +33,36 @@ public class MichiController : MonoBehaviour
             newPos = new Vector3(xDist, 0.26f, zDist);
             Debug.Log("michi newpos: " + newPos);
             animator.SetBool("walking", true);
-            path = pathfinding.FindPath(this.transform.position, newPos, -1);
+            path = new List<NodePathfinding>();
+            //path = pathfinding.FindPath(this.transform.position, newPos, -1);
         }
         else
         {
-            //this.transform.position = Vector3.MoveTowards(this.transform.position, newPos, walkSpeed * Time.deltaTime);
-            //this.transform.LookAt(newPos);
+            this.transform.position = Vector3.MoveTowards(this.transform.position, newPos, walkSpeed * Time.deltaTime);
+            this.transform.LookAt(newPos);
 
-            //if (Vector3.Distance(transform.position, newPos) < 4f)
-            //{
-            //    path = null;
-            //    animator.SetBool("walking", false);
-            //    animator.SetTrigger("hasArrived");
-            //}
-
-            if (Vector3.Distance(this.transform.position, path[i].mWorldPosition) < 1f)
+            if (Vector3.Distance(transform.position, newPos) < 4f)
             {
-                i++;
-                if (i >= path.Count)
-                {
-                    animator.SetBool("walking", false);
-                    animator.SetTrigger("hasArrived");
-                    path = null;
-                    i = 0;
-                    return;
-                }
+                path = null;
+                animator.SetBool("walking", false);
+                animator.SetTrigger("hasArrived");
             }
 
-            this.transform.position = Vector3.MoveTowards(this.transform.position, path[i].mWorldPosition, walkSpeed * Time.deltaTime);
-            this.transform.LookAt(path[i].mWorldPosition);
+            //if (Vector3.Distance(this.transform.position, path[i].mWorldPosition) < 1f)
+            //{
+            //    i++;
+            //    if (i >= path.Count)
+            //    {
+            //        animator.SetBool("walking", false);
+            //        animator.SetTrigger("hasArrived");
+            //        path = null;
+            //        i = 0;
+            //        return;
+            //    }
+            //}
+
+            //this.transform.position = Vector3.MoveTowards(this.transform.position, path[i].mWorldPosition, walkSpeed * Time.deltaTime);
+            //this.transform.LookAt(path[i].mWorldPosition);
         }
     }
 }
