@@ -3,7 +3,7 @@ using System.Collections;
 
 public class NodePlanning
 {
-    public SuperWorld.WorldState mWorldState;
+    public SuperWorld superWorld;
 
     public ActionPlanning mAction;
 
@@ -14,9 +14,9 @@ public class NodePlanning
 
     /***************************************************************************/
 
-    public NodePlanning(SuperWorld.WorldState worldState, ActionPlanning action)
+    public NodePlanning(SuperWorld superWorld, ActionPlanning action)
     {
-        mWorldState = worldState;
+        this.superWorld = new SuperWorld(superWorld);
         mAction = action;
 
         gCost = 0.0f;
@@ -38,7 +38,7 @@ public class NodePlanning
 
     public bool Equals(NodePlanning other)
     {
-        return mWorldState == other.mWorldState;
+        return (this.superWorld.IsEqualTo(other.superWorld));
     }
 
     /***************************************************************************/

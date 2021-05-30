@@ -77,6 +77,29 @@ public class SuperWorld : MonoBehaviour
 
     /***************************************************************************/
 
+    public bool IsEqualTo(SuperWorld superWorld)
+    {
+        bool result = false;
+
+        if (this.trees == superWorld.trees &&
+            this.mWorldState == superWorld.mWorldState &&
+            this.fox == superWorld.fox &&
+            this.axe == superWorld.axe &&
+            this.cottage == superWorld.cottage &&
+            this.feller == superWorld.feller &&
+            this.fellingTree == superWorld.fellingTree &&
+            this.trunk == superWorld.trunk &&
+            this.wood == superWorld.wood &&
+            this.hunger == superWorld.hunger &&
+            this.timesLeftToBuildCottage == superWorld.timesLeftToBuildCottage)
+        {
+            result = true;
+        }
+        return result;
+    }
+
+    /***************************************************************************/
+
     public GameObject GetNearestTreePosition()
     {
         GameObject result = trees[0];

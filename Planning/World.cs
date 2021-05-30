@@ -111,8 +111,8 @@ public class World : MonoBehaviour
 
 
             // If preconditions are met we can apply effects and the new state is valid
-            if ((node.mWorldState & action.mPreconditions) == action.mPreconditions &&
-                (node.mWorldState & action.mNegativePreconditions) == SuperWorld.WorldState.WORLD_STATE_NONE )
+            if ((node.superWorld.mWorldState & action.mPreconditions) == action.mPreconditions &&
+                (node.superWorld.mWorldState & action.mNegativePreconditions) == SuperWorld.WorldState.WORLD_STATE_NONE )
                 //Aquí van los efectos del world absoluto y de los worlds hijos
             {
                 SuperWorld aux = new SuperWorld(superWorld);
@@ -132,13 +132,11 @@ public class World : MonoBehaviour
                 }
 
                 // Apply positive effects
-                SuperWorld.WorldState positiveEffectsWorldState = (node.mWorldState | action.mEffects);
+                SuperWorld.WorldState positiveEffectsWorldState = (node.superWorld.mWorldState | action.mEffects);
                 // Apply negative effects
-                SuperWorld.WorldState finalWorldState = positiveEffectsWorldState & ~action.mNegativeEffects;
+                aux.mWorldState = positiveEffectsWorldState & ~action.mNegativeEffects;
 
-                // Create new superWorld
-
-                NodePlanning newNodePlanning = new NodePlanning(finalWorldState, action);
+                NodePlanning newNodePlanning = new NodePlanning(aux, action);
 
                 neighbours.Add(newNodePlanning);
             }

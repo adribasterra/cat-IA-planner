@@ -23,7 +23,13 @@ public class Planning : MonoBehaviour
 
     public List<NodePlanning> GetPlan()
     {
-        FindPlan(SuperWorld.WorldState.WORLD_STATE_NONE, SuperWorld.WorldState.WORLD_STATE_COTTAGE_BUILT);
+        SuperWorld init = new SuperWorld(superWorld);
+        init.mWorldState = SuperWorld.WorldState.WORLD_STATE_NONE;
+
+        SuperWorld goal = new SuperWorld(superWorld);
+        goal.mWorldState = SuperWorld.WorldState.WORLD_STATE_COTTAGE_BUILT;
+
+        FindPlan(init, goal);
 
         return mWorld.plan;
     }
@@ -36,7 +42,7 @@ public class Planning : MonoBehaviour
 
     /***************************************************************************/
 
-    public List<NodePlanning> FindPlan(SuperWorld.WorldState startWorldState, SuperWorld.WorldState targetWorldState)
+    public List<NodePlanning> FindPlan(SuperWorld startWorldState, SuperWorld targetWorldState)
     {
         CurrentStartNode = new NodePlanning(startWorldState, null);
         CurrentTargetNode = new NodePlanning(targetWorldState, null);
@@ -47,7 +53,7 @@ public class Planning : MonoBehaviour
         mWorld.openSet = openSet;
 
         NodePlanning node = CurrentStartNode;
-        while (openSet.Count > 0 && ((node.mWorldState & CurrentTargetNode.mWorldState) != CurrentTargetNode.mWorldState))
+        while (openSet.Count > 0 && ((node.superWorld.mWorldState & CurrentTargetNode.superWorld.mWorldState) != CurrentTargetNode.superWorld.mWorldState))
         {
             // Select best node from open list
             node = openSet[0];
@@ -67,13 +73,13 @@ public class Planning : MonoBehaviour
             mWorld.closedSet = closedSet;
 
             // Check destination
-            if (((node.mWorldState & CurrentTargetNode.mWorldState) != CurrentTargetNode.mWorldState))
+            if (((node.superWorld.mWorldState & CurrentTargetNode.superWorld.mWorldState) != CurrentTargetNode.superWorld.mWorldState))
             {
 
                 // Open neighbours
                 foreach (NodePlanning neighbour in mWorld.GetNeighbours(node))
                 {
-                    if ( /*!neighbour.mWalkable ||*/ closedSet.Any(n => n.mWorldState == neighbour.mWorldState))
+                    if ( /*!neighbour.mWalkable ||*/ closedSet.Any(n => n.superWorld.mWorldState == neighbour.superWorld.mWorldState))
                     {
                         continue;
                     }
@@ -85,13 +91,13 @@ public class Planning : MonoBehaviour
                     }
 
                     float newCostToNeighbour = node.gCost + GetDistance(node, neighbour);
-                    if (newCostToNeighbour < neighbour.gCost || !openSet.Any(n => n.mWorldState == neighbour.mWorldState))
+                    if (newCostToNeighbour < neighbour.gCost || !openSet.Any(n => n.superWorld.mWorldState == neighbour.superWorld.mWorldState))
                     {
                         neighbour.gCost = newCostToNeighbour;
                         neighbour.hCost = Heuristic(neighbour, CurrentTargetNode);
                         neighbour.mParent = node;
 
-                        if (!openSet.Any(n => n.mWorldState == neighbour.mWorldState))
+                        if (!openSet.Any(n => n.superWorld.mWorldState == neighbour.superWorld.mWorldState))
                         {
                             openSet.Add(neighbour);
                             mWorld.openSet = openSet;
@@ -99,7 +105,7 @@ public class Planning : MonoBehaviour
                         else
                         {
                             // Find neighbour and replace
-                            openSet[openSet.FindIndex(x => x.mWorldState == neighbour.mWorldState)] = neighbour;
+                            openSet[openSet.FindIndex(x => x.superWorld.mWorldState == neighbour.superWorld.mWorldState)] = neighbour;
                         }
                     }
                 }
@@ -180,7 +186,7 @@ public class Planning : MonoBehaviour
     float Heuristic(NodePlanning nodeA, NodePlanning nodeB)
     {
         // Heuristic function
-        return -World.PopulationCount((int)(nodeA.mWorldState | nodeB.mWorldState)) - World.PopulationCount((int)(nodeA.mWorldState & nodeB.mWorldState));
+        return -World.PopulationCount((int)(nodeA.superWorld.mWorldState | nodeB.superWorld.mWorldState)) - World.PopulationCount((int)(nodeA.superWorld.mWorldState & nodeB.superWorld.mWorldState));
     }
 
     /***************************************************************************/
