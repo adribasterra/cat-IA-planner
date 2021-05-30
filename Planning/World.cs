@@ -43,8 +43,8 @@ public class World : MonoBehaviour
         SuperWorld.WorldState.WORLD_STATE_AXE_OWNED,
         SuperWorld.WorldState.WORLD_STATE_NONE,
         SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
-        SuperWorld.WorldState.WORLD_STATE_NONE,                // PODRÍA PONER QUE SE ROMPA EL HACHA Y A BUSCARTE LA VIDA BUDDY
-        /*CalculateDynamicCost(GetNearestTreePosition(), 10.0f)*/10f, "Fell tree")
+        SuperWorld.WorldState.WORLD_STATE_NONE,
+        10.0f, "Fell tree")
         );
 
         mActionList.Add(
@@ -62,7 +62,7 @@ public class World : MonoBehaviour
         ActionPlanning.ActionType.ACTION_TYPE_EAT_RAW_MEAT,
         SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
         SuperWorld.WorldState.WORLD_STATE_NONE,
-        SuperWorld.WorldState.WORLD_STATE_NONE,              // HUNGER++
+        SuperWorld.WorldState.WORLD_STATE_NONE,             // HUNGER++
         SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
         5.0f, "Eat raw meat")
         );
@@ -72,7 +72,7 @@ public class World : MonoBehaviour
         ActionPlanning.ActionType.ACTION_TYPE_EAT_COOKED_MEAT,
         SuperWorld.WorldState.WORLD_STATE_HAS_MEAT | SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
         SuperWorld.WorldState.WORLD_STATE_NONE,
-        SuperWorld.WorldState.WORLD_STATE_NONE,              // HUNGER++++
+        SuperWorld.WorldState.WORLD_STATE_NONE,             // HUNGER++++
         SuperWorld.WorldState.WORLD_STATE_HAS_MEAT,
         15.0f, "Eat cooked meat")
         );
@@ -82,7 +82,7 @@ public class World : MonoBehaviour
         ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE,
         SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
         SuperWorld.WorldState.WORLD_STATE_NONE,
-        SuperWorld.WorldState.WORLD_STATE_NONE,           // COTTAGE++
+        SuperWorld.WorldState.WORLD_STATE_NONE,             // COTTAGE++
         SuperWorld.WorldState.WORLD_STATE_HAS_WOOD,
         25.0f, "Building cottage")
         );
@@ -132,12 +132,12 @@ public class World : MonoBehaviour
                         aux.hunger -= 10;
                         break;
                 }
-                if(target != null) action.mCost = CalculateDynamicCost(aux, target, action.mCost); Debug.Log(action.mActionType + " :" + action.mCost);
+                if(target != null) action.mCost = CalculateDynamicCost(aux, target, action.mCost);
                 
                 // Apply positive effects
                 SuperWorld.WorldState positiveEffectsWorldState = (node.superWorld.mWorldState | action.mEffects);
 
-                if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE/* && node.superWorld.timesLeftToBuildCottage > 0*/)
+                if (action.mActionType == ActionPlanning.ActionType.ACTION_TYPE_BUILD_COTTAGE)
                 {
                     aux.timesLeftToBuildCottage--;
 
@@ -151,7 +151,6 @@ public class World : MonoBehaviour
                 aux.mWorldState = positiveEffectsWorldState & ~action.mNegativeEffects;
 
                 NodePlanning newNodePlanning = new NodePlanning(aux, action);
-                Debug.Log(action.mActionType + ": " + aux.mWorldState);
                 neighbours.Add(newNodePlanning);
             }
         }
@@ -176,7 +175,6 @@ public class World : MonoBehaviour
             result = baseCost + Mathf.Abs(Vector3.Distance(superWorld.feller.transform.position, target.transform.position)) * (superWorld.hunger < 1 ? 1: superWorld.hunger);
         }
         else Debug.Log("TARGET IS NULL");
-        Debug.Log("Cost result: " + result);
         return result;
     }
 

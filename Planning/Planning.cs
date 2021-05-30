@@ -138,7 +138,7 @@ public class Planning : MonoBehaviour
             Debug.Log("ERROR: IMPOSSIBLE TO FIND PLAN");
         }
 
-        superWorld.ResetWorld();
+        //superWorld.ResetWorld();
 
         return mWorld.plan;
     }

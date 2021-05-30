@@ -5,7 +5,7 @@ using UnityEngine;
 public class SuperWorld : MonoBehaviour
 {
     [HideInInspector] public GameObject[] trees;
-    [HideInInspector] public SuperWorld.WorldState mWorldState;
+    [HideInInspector] public WorldState mWorldState;
     public Pathfinding pathfinding;
 
     [Header("Elements")]
@@ -46,17 +46,13 @@ public class SuperWorld : MonoBehaviour
         WORLD_STATE_CLOSE_TO_COTTAGE    = 4096,
     }
 
+    /***************************************************************************/
+
     void Awake()
     {
         timesLeftToBuildCottage = maxTimesToBuildCottage;
         trees = GameObject.FindGameObjectsWithTag("Tree");
         fellingTree = null;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     /***************************************************************************/
@@ -110,10 +106,10 @@ public class SuperWorld : MonoBehaviour
             // Set destination and origin as walkable so taht the pathfinding can find path
             feller.layer = 0;
             tree.transform.GetChild(0).GetChild(1).gameObject.layer = 0;
-            // TODO: TAMBIÉN LOS PUTOS HIJOS ME CAGO EN LA PUTA
             pathfinding.GetGrid().UpdateGrid();
 
-            if (pathfinding.FindPath(feller.transform.position, tree.transform.position.normalized, -1) != null)
+            if (pathfinding.FindPath(feller.transform.position, tree.transform.position.normalized, -1) != null &&
+                tree.transform.GetChild(0).gameObject.activeSelf)
             {
                 float dist = Mathf.Abs(Vector3.Distance(feller.transform.position, tree.transform.position));
                 if (minDistance > dist)
@@ -141,7 +137,6 @@ public class SuperWorld : MonoBehaviour
         this.tree = fellingTree.transform.Find("Tree").gameObject;
         wood = fellingTree.transform.Find("Wood").gameObject;
         trunk = fellingTree.transform.Find("Trunk").gameObject;
-        //Debug.Log("Tree: " + this.tree + ", " + "Wood: " + this.wood + ", " + "Trunk: " + this.trunk + " ");
     }
 
     public void FellTree()
@@ -177,6 +172,8 @@ public class SuperWorld : MonoBehaviour
 
     public void ResetWorld()
     {
-
+        mWorldState = WorldState.WORLD_STATE_NONE;
+        timesLeftToBuildCottage = maxTimesToBuildCottage;
+        hunger = 0;
     }
 }

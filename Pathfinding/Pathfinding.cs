@@ -261,7 +261,7 @@ public class Pathfinding : MonoBehaviour
                 auxList.Add(node);
             }
         }
-        resultList.Add(endNode);  // Add last node
+        resultList.Add(endNode);    // Add last node
 
         Grid.path = resultList;
     }

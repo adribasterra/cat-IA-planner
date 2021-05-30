@@ -217,7 +217,6 @@ public class NPBehaviourTree : MonoBehaviour
 
                                             if (pathfinding.InitPathfinding(mPlanner.GetWorld().feller.transform, nearestTree.transform))
                                             {
-                                                Debug.Log("Path set");
                                                 //Set path to feller
                                                 playerMovement.SetPath(pathfinding.GetGrid().path);
                                             }
@@ -628,9 +627,8 @@ public class NPBehaviourTree : MonoBehaviour
                                             GameObject stepObject = mPlanner.GetWorld().cottage.transform.GetChild(step - 1).gameObject;
                                             stepObject.GetComponent<MeshRenderer>().enabled = true;
                                             mPlanner.GetWorld().feller.GetComponent<PlayerController>().SetBagActive(false);
-                                            Debug.Log(step++);
-                                            
                                             mTimeStartAction = Time.time;
+                                            step++;
                                         }
 
                                         if (step > 4)
@@ -680,7 +678,7 @@ public class NPBehaviourTree : MonoBehaviour
                                     SuperWorld.WorldState negativeEffects = SuperWorld.WorldState.WORLD_STATE_NONE;
 
                                     // Check preconditions
-                                    if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions)
+                                    if ((mPlanner.GetWorld().mWorldState & preconditions) == preconditions && mPlanner.GetWorld().axe.activeSelf)
                                     {
                                         if (pathfinding?.GetGrid()?.path == null)
                                         {
