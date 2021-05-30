@@ -10,7 +10,7 @@ public class MichiController : MonoBehaviour
     private int i;
     private Vector3 newPos;
 
-    [Range(1, 5)] public float walkSpeed;
+    [Range(0.5f, 5)] public float walkSpeed;
 
     // Start is called before the first frame update
     void Start()
@@ -32,6 +32,7 @@ public class MichiController : MonoBehaviour
 
             newPos = new Vector3(xDist, 0.26f, zDist);
             //Debug.Log("michi newpos: " + newPos);
+
             animator.SetBool("walking", true);
             path = new List<NodePathfinding>();
             //path = pathfinding.FindPath(this.transform.position, newPos, -1);
